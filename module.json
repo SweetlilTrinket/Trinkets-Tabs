@@ -1,0 +1,30 @@
+{
+  "id": "trinket-tabs",
+  "title": "Trinket's Tabs",
+  "description": "Adds a collapsible Luck tab to all actor sheets, allowing players and GMs to track a Luck score out of 20.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Custom Module"
+    }
+  ],
+  "esmodules": [
+    "scripts/luck-tab.js",
+    "scripts/luck-spend.js"
+  ],
+  "styles": [
+    "styles/luck-tab.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "flags": {}
+}

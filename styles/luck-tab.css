@@ -1,0 +1,119 @@
+/* All styling is applied via JS inline styles to avoid layout interference */
+
+/* ── AP Tracker Frame ──────────────────────────────────────── */
+.ltc-ap-frame {
+  margin: 2px 0 6px;
+  padding: 10px 14px 12px;
+  background: linear-gradient(160deg, #05111f 0%, #0a1d33 100%);
+  border: 1.5px solid #2a6aaa;
+  border-radius: 8px;
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 rgba(100, 180, 255, 0.08),
+    0 0 14px rgba(30, 90, 180, 0.25);
+}
+
+.ltc-ap-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(60,130,255,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ltc-ap-frame-label {
+  font-size: 0.68em;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #4a9fdf;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ltc-ap-frame-label i {
+  color: #5ab8f0;
+  font-size: 0.9em;
+}
+
+/* ── AP Pips ────────────────────────────────────────────────── */
+.ltc-ap-pips {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-bottom: 8px;
+}
+
+.ltc-ap-pip {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #0a1825;
+  border: 2px solid #1a3a5a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.ltc-ap-pip::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(40,80,120,0.4), transparent 70%);
+}
+
+.ltc-ap-pip-filled {
+  background: radial-gradient(circle at 35% 30%, #72c6ff 0%, #2a80d4 45%, #1050a0 100%);
+  border-color: #5ab0f0;
+  box-shadow:
+    0 0 12px rgba(80, 160, 255, 0.7),
+    0 0 24px rgba(40, 100, 220, 0.4),
+    inset 0 1px 0 rgba(200, 240, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 40, 100, 0.5);
+  animation: apPipShine 3s ease-in-out infinite;
+}
+
+.ltc-ap-pip-filled::after {
+  background: radial-gradient(circle at 35% 28%, rgba(220, 245, 255, 0.45), transparent 55%);
+}
+
+@keyframes apPipShine {
+  0%, 100% {
+    box-shadow:
+      0 0 10px rgba(80, 160, 255, 0.6),
+      0 0 20px rgba(40, 100, 220, 0.3),
+      inset 0 1px 0 rgba(200, 240, 255, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 16px rgba(100, 180, 255, 0.85),
+      0 0 32px rgba(60, 130, 240, 0.5),
+      inset 0 1px 0 rgba(220, 248, 255, 0.55);
+  }
+}
+
+.ltc-ap-refill-hint {
+  font-size: 0.65em;
+  color: #2a5a7a;
+  text-align: center;
+  letter-spacing: 0.3px;
+  font-style: italic;
+}
+
+/* ── Unaffordable action buttons ────────────────────────────── */
+.ltc-action-btn.ltc-action-unaffordable {
+  opacity: 0.38;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.ltc-action-btn.ltc-action-unaffordable:hover {
+  background: #2a0808 !important;
+  border-color: #6b1a1a !important;
+  color: #e8d5c4 !important;
+}
+
