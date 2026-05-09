@@ -1,0 +1,199 @@
+{{!-- templates/rp-sidebar.hbs --}}
+<div class="rp-distributor-app">
+
+  <div class="rp-top-spacer"></div>
+  <header class="rp-header">
+    <div class="rp-header-icon">⚔</div>
+    <div class="rp-header-text">
+      <h2>RP Distributor</h2>
+      <span class="rp-subtitle">GM Distribution Panel</span>
+    </div>
+  </header>
+
+  {{!-- Sub-tab nav --}}
+  <nav class="rp-subtab-nav">
+    <button class="rp-subtab-btn rp-subtab-active" data-subtab="rp">
+      <span class="rp-subtab-icon">◈</span> Reward Points
+    </button>
+    <button class="rp-subtab-btn" data-subtab="tracker">
+      <span class="rp-subtab-icon">☠</span> Tracker
+    </button>
+  </nav>
+
+  {{!-- ══ SUB-TAB: Reward Points ══ --}}
+  <div class="rp-subtab-panel rp-subtab-panel-active" data-subtab-panel="rp">
+
+    <section class="rp-bulk-section">
+      <h3 class="rp-section-title">
+        <span class="rp-section-icon">◈</span>
+        Bulk Actions
+      </h3>
+      <div class="rp-bulk-controls">
+        <div class="rp-input-group">
+          <label for="bulk-rp-value">RP Amount</label>
+          <input type="number" id="bulk-rp-value" class="rp-input" value="0" min="0" placeholder="0" />
+        </div>
+        <div class="rp-bulk-buttons">
+          <button class="rp-btn rp-btn-set-all" data-action="set-all">
+            <span class="rp-btn-icon">↠</span> Set All
+          </button>
+          <button class="rp-btn rp-btn-add-all" data-action="add-all">
+            <span class="rp-btn-icon">+</span> Add to All
+          </button>
+        </div>
+      </div>
+      <div class="rp-bulk-scope">
+        <label class="rp-checkbox-label">
+          <input type="checkbox" id="bulk-selected-only" />
+          <span class="rp-checkbox-custom"></span>
+          Apply to selected only
+        </label>
+      </div>
+    </section>
+
+    <div class="rp-divider"></div>
+
+    <section class="rp-characters-section">
+      <h3 class="rp-section-title">
+        <span class="rp-section-icon">◈</span>
+        Characters
+        <span class="rp-char-count">({{characters.length}})</span>
+      </h3>
+      {{#if characters.length}}
+        <ul class="rp-character-list">
+          {{#each characters}}
+          <li class="rp-character-row {{#if this.excluded}}rp-excluded{{/if}}" data-actor-id="{{this.id}}">
+            <div class="rp-char-select">
+              <label class="rp-checkbox-label">
+                <input type="checkbox" class="rp-include-check" data-actor-id="{{this.id}}" {{#unless this.excluded}}checked{{/unless}} />
+                <span class="rp-checkbox-custom"></span>
+              </label>
+            </div>
+            <div class="rp-char-avatar">
+              {{#if this.img}}
+                <img src="{{this.img}}" alt="{{this.name}}" />
+              {{else}}
+                <div class="rp-char-avatar-placeholder">{{this.initial}}</div>
+              {{/if}}
+            </div>
+            <div class="rp-char-info">
+              <span class="rp-char-name">{{this.name}}</span>
+              <span class="rp-char-current">Current: <strong>{{this.rpTotal}}</strong></span>
+            </div>
+            <div class="rp-char-controls">
+              <input type="number" class="rp-input rp-char-input" data-actor-id="{{this.id}}" value="{{this.rpTotal}}" min="0" />
+              <div class="rp-char-buttons">
+                <button class="rp-btn-sm rp-btn-set" data-action="set-one" data-actor-id="{{this.id}}" title="Set RP">↠</button>
+                <button class="rp-btn-sm rp-btn-add" data-action="add-one" data-actor-id="{{this.id}}" title="Add RP">+</button>
+              </div>
+            </div>
+          </li>
+          {{/each}}
+        </ul>
+      {{else}}
+        <div class="rp-empty"><span>No character actors found.</span></div>
+      {{/if}}
+    </section>
+
+  </div>{{!-- end rp subtab --}}
+
+  {{!-- ══ SUB-TAB: Tracker ══ --}}
+  <div class="rp-subtab-panel" data-subtab-panel="tracker">
+
+    <section class="rp-tracker-section">
+      <h3 class="rp-section-title">
+        <span class="rp-section-icon">☠</span>
+        Peril &amp; Damage
+        <span class="rp-char-count">({{characters.length}})</span>
+      </h3>
+
+      {{#if characters.length}}
+        <ul class="rp-tracker-list">
+          {{#each characters}}
+          {{#unless this.trackerExcluded}}
+          <li class="rp-tracker-row" data-actor-id="{{this.id}}">
+
+            {{!-- Identity row with exclude toggle --}}
+            <div class="rp-tracker-identity">
+              <label class="rp-checkbox-label rp-tracker-toggle" title="Hide from tracker">
+                <input type="checkbox" class="rp-tracker-include-check" data-actor-id="{{this.id}}" checked />
+                <span class="rp-checkbox-custom"></span>
+              </label>
+              <div class="rp-char-avatar rp-tracker-avatar">
+                {{#if this.img}}
+                  <img src="{{this.img}}" alt="{{this.name}}" />
+                {{else}}
+                  <div class="rp-char-avatar-placeholder">{{this.initial}}</div>
+                {{/if}}
+              </div>
+              <span class="rp-tracker-name">{{this.name}}</span>
+            </div>
+
+            {{!-- Peril --}}
+            <div class="rp-tracker-stat rp-tracker-peril">
+              <div class="rp-tracker-stat-header">
+                <span class="rp-tracker-label rp-peril-label">☁ Peril</span>
+                <span class="rp-tracker-badge rp-peril-badge" data-actor-id="{{this.id}}" data-stat="peril">{{this.perilTaken}}/{{this.perilMax}}</span>
+              </div>
+              <div class="rp-tracker-pips" data-actor-id="{{this.id}}" data-stat="peril" data-max="{{this.perilMax}}" data-current="{{this.perilCurrent}}"></div>
+              <div class="rp-tracker-controls">
+                <button class="rp-tracker-btn rp-tracker-minus" data-action="tracker-dec" data-actor-id="{{this.id}}" data-stat="peril" title="Reduce Peril">−</button>
+                <input type="number" class="rp-input rp-tracker-input" data-actor-id="{{this.id}}" data-stat="peril" value="{{this.perilTaken}}" min="0" max="{{this.perilMax}}" />
+                <button class="rp-tracker-btn rp-tracker-plus rp-peril-plus" data-action="tracker-inc" data-actor-id="{{this.id}}" data-stat="peril" title="Increase Peril">+</button>
+                <button class="rp-tracker-btn rp-tracker-set" data-action="tracker-set" data-actor-id="{{this.id}}" data-stat="peril" title="Set Peril">↠</button>
+              </div>
+            </div>
+
+            {{!-- Damage --}}
+            <div class="rp-tracker-stat rp-tracker-damage">
+              <div class="rp-tracker-stat-header">
+                <span class="rp-tracker-label rp-damage-label">💀 Damage</span>
+                <span class="rp-tracker-badge rp-damage-badge" data-actor-id="{{this.id}}" data-stat="damage">{{this.damageTaken}}/{{this.damageMax}}</span>
+              </div>
+              <div class="rp-tracker-pips" data-actor-id="{{this.id}}" data-stat="damage" data-max="{{this.damageMax}}" data-current="{{this.damageCurrent}}"></div>
+              <div class="rp-tracker-controls">
+                <button class="rp-tracker-btn rp-tracker-minus" data-action="tracker-dec" data-actor-id="{{this.id}}" data-stat="damage" title="Reduce Damage">−</button>
+                <input type="number" class="rp-input rp-tracker-input" data-actor-id="{{this.id}}" data-stat="damage" value="{{this.damageTaken}}" min="0" max="{{this.damageMax}}" />
+                <button class="rp-tracker-btn rp-tracker-plus rp-damage-plus" data-action="tracker-inc" data-actor-id="{{this.id}}" data-stat="damage" title="Increase Damage">+</button>
+                <button class="rp-tracker-btn rp-tracker-set" data-action="tracker-set" data-actor-id="{{this.id}}" data-stat="damage" title="Set Damage">↠</button>
+              </div>
+            </div>
+
+          </li>
+          {{/unless}}
+          {{/each}}
+
+          {{!-- Hidden / excluded rows shown dimmed at bottom with re-add toggle --}}
+          {{#each characters}}
+          {{#if this.trackerExcluded}}
+          <li class="rp-tracker-row rp-tracker-row-excluded" data-actor-id="{{this.id}}">
+            <div class="rp-tracker-identity">
+              <label class="rp-checkbox-label rp-tracker-toggle" title="Show in tracker">
+                <input type="checkbox" class="rp-tracker-include-check" data-actor-id="{{this.id}}" />
+                <span class="rp-checkbox-custom"></span>
+              </label>
+              <div class="rp-char-avatar rp-tracker-avatar">
+                {{#if this.img}}
+                  <img src="{{this.img}}" alt="{{this.name}}" />
+                {{else}}
+                  <div class="rp-char-avatar-placeholder">{{this.initial}}</div>
+                {{/if}}
+              </div>
+              <span class="rp-tracker-name rp-tracker-name-excluded">{{this.name}}</span>
+              <span class="rp-tracker-excluded-label">hidden</span>
+            </div>
+          </li>
+          {{/if}}
+          {{/each}}
+
+        </ul>
+      {{else}}
+        <div class="rp-empty"><span>No character actors found.</span></div>
+      {{/if}}
+    </section>
+
+  </div>{{!-- end tracker subtab --}}
+
+  <div class="rp-status" id="rp-status"></div>
+
+</div>
