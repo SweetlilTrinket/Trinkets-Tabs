@@ -9,7 +9,7 @@
   },
   "authors": [
     {
-      "name": "Custom Module"
+      "name": "Trinket"
     }
   ],
   "esmodules": [
@@ -29,6 +29,5 @@
       "path": "lang/en.json"
     }
   ],
-  "system": ["zweihander"],
   "flags": {}
 }
