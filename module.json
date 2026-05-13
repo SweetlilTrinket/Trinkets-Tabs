@@ -32,4 +32,5 @@
   "system": ["zweihander"],
   "flags": {}
   "manifest": "https://raw.githubusercontent.com/SweetlilTrinket/Trinkets-Tabs/refs/heads/main/module.json"
+  "download": "https://github.com/SweetlilTrinket/Trinkets-Tabs/archive/refs/heads/main.zip"
 }
