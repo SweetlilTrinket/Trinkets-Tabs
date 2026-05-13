@@ -1,17 +1,15 @@
 {
-  "manifest": "https://raw.githubusercontent.com/SweetlilTrinket/Trinkets-Tabs/main/module.json",
-"download": "https://github.com/SweetlilTrinket/Trinkets-Tabs/archive/refs/heads/main.zip",
   "id": "trinket-tabs",
   "title": "Trinket's Tabs",
   "description": "Zweihander QoL bundle for Foundry v13: floating Luck/Rest/Combat panels on actor sheets, Action Point tracker, Spend-Luck-on-failed-rolls chat button, and a GM-only RP Distributor sidebar tab with Reward Points + Peril/Damage trackers.",
-  "version": "1.0",
+  "version": "1.1.0",
   "compatibility": {
     "minimum": "13",
     "verified": "13"
   },
   "authors": [
     {
-      "name": "Trinket"
+      "name": "Custom Module"
     }
   ],
   "esmodules": [
@@ -30,5 +28,7 @@
       "name": "English",
       "path": "lang/en.json"
     }
-  ]
+  ],
+  "system": ["zweihander"],
+  "flags": {}
 }

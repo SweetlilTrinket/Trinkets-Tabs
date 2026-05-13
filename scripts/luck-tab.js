@@ -1395,6 +1395,20 @@ function ensureStyles() {
     }
     .ltc-action-btn:hover { background: #3d0f0f; border-color: #cc3333; color: #fff; }
     .ltc-dot { width: 5px; height: 5px; border-radius: 50%; background: #cc2222; flex-shrink: 0; }
+    .ltc-ap-pips { display: flex; gap: 6px; align-items: center; margin: 4px 0; }
+    .ltc-ap-pip {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid #2a3a4a; background: #0c1a2e;
+      cursor: pointer; transition: transform .1s, border-color .15s;
+      flex-shrink: 0;
+    }
+    .ltc-ap-pip:hover { transform: scale(1.2); border-color: #5ab0f0; }
+    .ltc-ap-pip-filled {
+      background: radial-gradient(circle at 35% 30%, #72c6ff, #1a6fc4);
+      border-color: #5ab0f0;
+      box-shadow: 0 0 6px #3a9fffaa, 0 0 2px #aaddff;
+    }
+    .ltc-ap-pip-filled:hover { border-color: #aaddff; }
     .ltc-ap {
       margin-left: auto; background: #5a0000; color: #ff9090;
       border-radius: 3px; font-size: .7em; padding: 1px 4px; white-space: nowrap; flex-shrink: 0;
@@ -1761,6 +1775,25 @@ function refreshAPUI(inst, actor) {
   const pipsContainer = inst.combatPanel.querySelector("#ltc-ap-pips");
   if (!pipsContainer) return;
   pipsContainer.innerHTML = buildAPPips(currentAP);
+
+  // Re-attach pip click handler after every innerHTML rebuild.
+  // stopPropagation prevents the click bubbling up to the combatBtn toggle.
+  pipsContainer.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    const pip = e.target.closest(".ltc-ap-pip");
+    if (!pip) return;
+    const pipIndex = parseInt(pip.dataset.pip); // 0-based
+    const pipValue = pipIndex + 1;
+    const current  = getAP(actor);
+    if (pip.classList.contains("ltc-ap-pip-filled")) {
+      const newAP = pipIndex === 0 && current === 1 ? 0 : pipIndex;
+      await setAP(actor, newAP);
+    } else {
+      await setAP(actor, pipValue);
+    }
+    refreshAPUI(inst, actor);
+  }, { once: true }); // once: true so it doesn't stack on repeated refreshes
+
   // Dim action buttons that cost more AP than available
   inst.combatPanel.querySelectorAll(".ltc-action-btn").forEach(btn => {
     const actionName = btn.dataset.action;
@@ -1877,7 +1910,15 @@ function attach(app) {
   if (!isSheet) return;
 
   const appId = getAppId(app);
-  if (_instances.has(appId)) teardown(appId);
+
+  // If already attached, just refresh UI — don't teardown/rebuild which closes panels.
+  if (_instances.has(appId)) {
+    const inst = _instances.get(appId);
+    refreshLuckUI(inst, actor);
+    refreshRestUI(inst, actor);
+    refreshAPUI(inst, actor);
+    return;
+  }
 
   ensureStyles();
 
@@ -1909,10 +1950,9 @@ function attach(app) {
   // Luck panel wiring
   const openLuck  = () => { luckPanel.classList.add("ltp-open"); bringToFront(luckPanel); };
   const closeLuck = () => luckPanel.classList.remove("ltp-open");
-  luckBtn.addEventListener("click", () =>
-    luckPanel.classList.contains("ltp-open") ? closeLuck() : openLuck()
-  );
-  luckPanel.querySelector(".ltp-close").addEventListener("click", closeLuck);
+  luckBtn.addEventListener("click", (e) => { e.stopPropagation(); luckPanel.classList.contains("ltp-open") ? closeLuck() : openLuck(); });
+  luckPanel.addEventListener("click", (e) => e.stopPropagation());
+  luckPanel.querySelector(".ltp-close").addEventListener("click", (e) => { e.stopPropagation(); closeLuck(); });
   luckPanel.querySelectorAll(".ltp-pip").forEach(pip => {
     pip.addEventListener("click", async () => {
       const t = parseInt(pip.dataset.pip);
@@ -1933,10 +1973,9 @@ function attach(app) {
   // Rest panel wiring
   const openRest  = () => { restPanel.classList.add("ltr-open"); bringToFront(restPanel); };
   const closeRest = () => restPanel.classList.remove("ltr-open");
-  restBtn.addEventListener("click", () =>
-    restPanel.classList.contains("ltr-open") ? closeRest() : openRest()
-  );
-  restPanel.querySelector(".ltr-close").addEventListener("click", closeRest);
+  restBtn.addEventListener("click", (e) => { e.stopPropagation(); restPanel.classList.contains("ltr-open") ? closeRest() : openRest(); });
+  restPanel.addEventListener("click", (e) => e.stopPropagation());
+  restPanel.querySelector(".ltr-close").addEventListener("click", (e) => { e.stopPropagation(); closeRest(); });
   restPanel.querySelector(".ltr-rest-btn").addEventListener("click", () =>
     doRest(actor, restPanel, inst)
   );
@@ -1944,10 +1983,9 @@ function attach(app) {
   // Combat panel wiring — pass actor so embedded actions know who's acting
   const openCombat  = () => { combatPanel.classList.add("ltc-open"); bringToFront(combatPanel); };
   const closeCombat = () => combatPanel.classList.remove("ltc-open");
-  combatBtn.addEventListener("click", () =>
-    combatPanel.classList.contains("ltc-open") ? closeCombat() : openCombat()
-  );
-  combatPanel.querySelector(".ltc-close").addEventListener("click", closeCombat);
+  combatBtn.addEventListener("click", (e) => { e.stopPropagation(); combatPanel.classList.contains("ltc-open") ? closeCombat() : openCombat(); });
+  combatPanel.addEventListener("click", (e) => e.stopPropagation());
+  combatPanel.querySelector(".ltc-close").addEventListener("click", (e) => { e.stopPropagation(); closeCombat(); });
   wireCombatPanel(combatPanel, actor, inst);  // <-- actor + inst passed in
   refreshAPUI(inst, actor); // initial dimming state
 

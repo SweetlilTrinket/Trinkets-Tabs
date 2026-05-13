@@ -5,7 +5,7 @@
   <header class="rp-header">
     <div class="rp-header-icon">⚔</div>
     <div class="rp-header-text">
-      <h2>RP Distributor</h2>
+      <h2>GM Panel</h2>
       <span class="rp-subtitle">GM Distribution Panel</span>
     </div>
   </header>
@@ -133,14 +133,15 @@
             <div class="rp-tracker-stat rp-tracker-peril">
               <div class="rp-tracker-stat-header">
                 <span class="rp-tracker-label rp-peril-label">☁ Peril</span>
-                <span class="rp-tracker-badge rp-peril-badge" data-actor-id="{{this.id}}" data-stat="peril">{{this.perilTaken}}/{{this.perilMax}}</span>
+                <span class="rp-tracker-badge rp-peril-badge" data-actor-id="{{this.id}}" data-stat="peril">PT: {{this.perilThreshold}} | {{this.perilThreshold2}} | {{this.perilThreshold3}} | {{this.perilThreshold4}}</span>
               </div>
-              <div class="rp-tracker-pips" data-actor-id="{{this.id}}" data-stat="peril" data-max="{{this.perilMax}}" data-current="{{this.perilCurrent}}"></div>
-              <div class="rp-tracker-controls">
-                <button class="rp-tracker-btn rp-tracker-minus" data-action="tracker-dec" data-actor-id="{{this.id}}" data-stat="peril" title="Reduce Peril">−</button>
-                <input type="number" class="rp-input rp-tracker-input" data-actor-id="{{this.id}}" data-stat="peril" value="{{this.perilTaken}}" min="0" max="{{this.perilMax}}" />
-                <button class="rp-tracker-btn rp-tracker-plus rp-peril-plus" data-action="tracker-inc" data-actor-id="{{this.id}}" data-stat="peril" title="Increase Peril">+</button>
-                <button class="rp-tracker-btn rp-tracker-set" data-action="tracker-set" data-actor-id="{{this.id}}" data-stat="peril" title="Set Peril">↠</button>
+              <div class="rp-tracker-pip-row">
+                <div class="rp-tracker-pips" data-actor-id="{{this.id}}" data-stat="peril" data-max="{{this.perilMax}}" data-current="{{this.perilCurrent}}"></div>
+                <div class="rp-tracker-controls">
+                  <button class="rp-tracker-btn rp-tracker-minus" data-action="tracker-dec" data-actor-id="{{this.id}}" data-stat="peril" title="Reduce Peril">−</button>
+                  <input type="number" class="rp-input rp-tracker-input" data-actor-id="{{this.id}}" data-stat="peril" value="{{this.perilTaken}}" min="0" max="{{this.perilMax}}" />
+                  <button class="rp-tracker-btn rp-tracker-plus rp-peril-plus" data-action="tracker-inc" data-actor-id="{{this.id}}" data-stat="peril" title="Increase Peril">+</button>
+                </div>
               </div>
             </div>
 
@@ -148,14 +149,15 @@
             <div class="rp-tracker-stat rp-tracker-damage">
               <div class="rp-tracker-stat-header">
                 <span class="rp-tracker-label rp-damage-label">💀 Damage</span>
-                <span class="rp-tracker-badge rp-damage-badge" data-actor-id="{{this.id}}" data-stat="damage">{{this.damageTaken}}/{{this.damageMax}}</span>
+                <span class="rp-tracker-badge rp-damage-badge" data-actor-id="{{this.id}}" data-stat="damage">DT: {{this.damageThreshold}} | {{this.damageThreshold2}} | {{this.damageThreshold3}} | {{this.damageThreshold4}}</span>
               </div>
-              <div class="rp-tracker-pips" data-actor-id="{{this.id}}" data-stat="damage" data-max="{{this.damageMax}}" data-current="{{this.damageCurrent}}"></div>
-              <div class="rp-tracker-controls">
-                <button class="rp-tracker-btn rp-tracker-minus" data-action="tracker-dec" data-actor-id="{{this.id}}" data-stat="damage" title="Reduce Damage">−</button>
-                <input type="number" class="rp-input rp-tracker-input" data-actor-id="{{this.id}}" data-stat="damage" value="{{this.damageTaken}}" min="0" max="{{this.damageMax}}" />
-                <button class="rp-tracker-btn rp-tracker-plus rp-damage-plus" data-action="tracker-inc" data-actor-id="{{this.id}}" data-stat="damage" title="Increase Damage">+</button>
-                <button class="rp-tracker-btn rp-tracker-set" data-action="tracker-set" data-actor-id="{{this.id}}" data-stat="damage" title="Set Damage">↠</button>
+              <div class="rp-tracker-pip-row">
+                <div class="rp-tracker-pips" data-actor-id="{{this.id}}" data-stat="damage" data-max="{{this.damageMax}}" data-current="{{this.damageCurrent}}"></div>
+                <div class="rp-tracker-controls">
+                  <button class="rp-tracker-btn rp-tracker-minus" data-action="tracker-dec" data-actor-id="{{this.id}}" data-stat="damage" title="Reduce Damage">−</button>
+                  <input type="number" class="rp-input rp-tracker-input" data-actor-id="{{this.id}}" data-stat="damage" value="{{this.damageTaken}}" min="0" max="{{this.damageMax}}" />
+                  <button class="rp-tracker-btn rp-tracker-plus rp-damage-plus" data-action="tracker-inc" data-actor-id="{{this.id}}" data-stat="damage" title="Increase Damage">+</button>
+                </div>
               </div>
             </div>
 

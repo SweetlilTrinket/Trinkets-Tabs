@@ -78,9 +78,17 @@ function _getTemplateData() {
       perilCurrent:    _getActorStat(a, "peril"),
       perilTaken:      TRACKER_MAX - _getActorStat(a, "peril"),
       perilMax:        TRACKER_MAX,
+      perilThreshold:  a.system?.stats?.secondaryAttributes?.perilThreshold?.value ?? "?",
+      perilThreshold2: (a.system?.stats?.secondaryAttributes?.perilThreshold?.value ?? null) !== null ? a.system.stats.secondaryAttributes.perilThreshold.value + 6  : "?",
+      perilThreshold3: (a.system?.stats?.secondaryAttributes?.perilThreshold?.value ?? null) !== null ? a.system.stats.secondaryAttributes.perilThreshold.value + 12 : "?",
+      perilThreshold4: (a.system?.stats?.secondaryAttributes?.perilThreshold?.value ?? null) !== null ? a.system.stats.secondaryAttributes.perilThreshold.value + 18 : "?",
       damageCurrent:   _getActorStat(a, "damage"),
       damageTaken:     TRACKER_MAX - _getActorStat(a, "damage"),
       damageMax:       TRACKER_MAX,
+      damageThreshold: a.system?.stats?.secondaryAttributes?.damageThreshold?.value ?? "?",
+      damageThreshold2: (a.system?.stats?.secondaryAttributes?.damageThreshold?.value ?? null) !== null ? a.system.stats.secondaryAttributes.damageThreshold.value + 6  : "?",
+      damageThreshold3: (a.system?.stats?.secondaryAttributes?.damageThreshold?.value ?? null) !== null ? a.system.stats.secondaryAttributes.damageThreshold.value + 12 : "?",
+      damageThreshold4: (a.system?.stats?.secondaryAttributes?.damageThreshold?.value ?? null) !== null ? a.system.stats.secondaryAttributes.damageThreshold.value + 18 : "?",
     }));
 
   return { characters };
@@ -238,13 +246,6 @@ function _bindTrackerEvents(panel) {
       _trackerSet(panel, actorId, stat, Math.min(TRACKER_MAX, _getActorStat(actor, stat) + 1));
     })
   );
-  panel.querySelectorAll('[data-action="tracker-set"]').forEach(btn =>
-    btn.addEventListener("click", ev => {
-      const { actorId, stat } = ev.currentTarget.dataset;
-      const input = panel.querySelector(`.rp-tracker-input[data-actor-id="${actorId}"][data-stat="${stat}"]`);
-      _trackerSet(panel, actorId, stat, TRACKER_MAX - parseInt(input?.value ?? 0, 10));
-    })
-  );
   panel.querySelectorAll(".rp-tracker-input").forEach(input =>
     input.addEventListener("keydown", ev => {
       if (ev.key === "Enter")
@@ -282,8 +283,7 @@ async function _trackerSet(panel, actorId, stat, value) {
 }
 
 function _updateTrackerUI(panel, actorId, stat, value) {
-  const badge = panel.querySelector(`.rp-tracker-badge[data-actor-id="${actorId}"][data-stat="${stat}"]`);
-  if (badge) badge.textContent = `${TRACKER_MAX - value}/${TRACKER_MAX}`;
+  // Badge now shows static threshold (PT/DT), not a live counter — no update needed.
 
   const input = panel.querySelector(`.rp-tracker-input[data-actor-id="${actorId}"][data-stat="${stat}"]`);
   if (input) input.value = TRACKER_MAX - value;
@@ -350,6 +350,17 @@ function _showStatus(panel, message, type = "success") {
 /* ════════════════════════════════════════════════════════════
    Tab switching
    ════════════════════════════════════════════════════════════ */
+function _deactivateTab() {
+  const sidebarContent = document.querySelector("#sidebar-content");
+  if (!sidebarContent) return;
+  sidebarContent.classList.remove(`active-${TAB_NAME}`);
+  const ourBtn = document.querySelector(`#sidebar-tabs menu button[data-tab="${TAB_NAME}"]`);
+  if (ourBtn) {
+    ourBtn.classList.remove("active");
+    ourBtn.setAttribute("aria-pressed", "false");
+  }
+}
+
 function _activateTab() {
   const sidebarContent = document.querySelector("#sidebar-content");
   const tabsNav        = document.querySelector("#sidebar-tabs menu");
@@ -372,30 +383,28 @@ function _injectCSS() {
   style.id = "rp-distributor-tab-css";
   style.textContent = `
     #sidebar-content [data-tab="${TAB_NAME}"] { display: none !important; }
-    #sidebar-content.active-${TAB_NAME} [data-tab="${TAB_NAME}"] {
-      display: flex !important;
-      flex-direction: column;
-      flex: 1 1 0;
-      min-height: 0;
-      width: 100% !important;
-      max-width: 100% !important;
-      overflow: hidden;
-      padding: 0;
-      box-sizing: border-box;
-      background: #110a04;
-      align-self: stretch;
-    }
     #sidebar-content.active-${TAB_NAME} > *:not([data-tab="${TAB_NAME}"]) {
       display: none !important;
     }
-    #sidebar-content.active-${TAB_NAME} {
-      overflow: hidden;
-      align-items: stretch;
+    #sidebar-content.active-${TAB_NAME} [data-tab="${TAB_NAME}"] {
+      display: flex !important;
+      flex-direction: column;
+      position: static !important;
+      width: 300px !important;
+      height: 100% !important;
+      overflow: hidden !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-sizing: border-box;
+      background: #110a04;
     }
-    /* Ensure our app shell fills the panel */
     #${TAB_NAME} .rp-distributor-app {
+      flex: 1 1 auto;
       width: 100% !important;
       min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      box-sizing: border-box;
     }
   `;
   document.head.appendChild(style);
@@ -437,12 +446,14 @@ async function _ensureSidebarTab(source = "?") {
 
   _injectCSS();
 
-  // If something else already injected our tab (e.g. a stale
-  // copy of the old rp-distributor module), bail and remember.
+  // If the tab panel is already in the DOM, the sidebar re-rendered.
+  // Reset the flag so we re-inject fresh (moves the button to the right slot).
   if (document.querySelector(`#sidebar-content [data-tab="${TAB_NAME}"]`)) {
-    console.log("RP Distributor | tab already in DOM (probably old rp-distributor module is still enabled) — marking injected");
-    _sidebarInjected = true;
-    return;
+    console.log("RP Distributor | tab already in DOM — removing and re-injecting to ensure correct position");
+    document.querySelector(`#sidebar-content [data-tab="${TAB_NAME}"]`)?.remove();
+    const oldBtn = document.querySelector(`#sidebar-tabs menu button[data-tab="${TAB_NAME}"]`);
+    oldBtn?.closest("li")?.remove();
+    _sidebarInjected = false;
   }
 
   const menu = document.querySelector("#sidebar-tabs menu");
@@ -466,20 +477,42 @@ async function _ensureSidebarTab(source = "?") {
   btn.setAttribute("data-tab",      TAB_NAME);
   btn.setAttribute("data-group",    "primary");
   btn.setAttribute("aria-pressed",  "false");
-  btn.setAttribute("aria-label",    "RP Distributor");
+  btn.setAttribute("aria-label",    "GM Panel");
   btn.setAttribute("aria-controls", TAB_NAME);
-  btn.setAttribute("data-tooltip",  "RP Distributor");
+  btn.setAttribute("data-tooltip",  "GM Panel");
   btn.setAttribute("role",          "tab");
-  btn.addEventListener("click", _activateTab);
+  btn.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    ev.preventDefault();
+    if (!ui.sidebar.expanded) ui.sidebar.expand();
+    _activateTab();
+  });
   li.appendChild(btn);
-  menu.appendChild(li);
+  // Insert between Scenes and Actors. Log all tab buttons for debugging.
+  const allBtns = [...menu.querySelectorAll("button[data-action='tab']")];
+  console.log("RP Distributor | sidebar tab buttons found:", allBtns.map(b => `tab=${b.dataset.tab} tooltip=${b.dataset.tooltip}`));
+  const actorsBtn = allBtns.find(b => b.dataset.tab === "actors" || b.dataset.tooltip?.toLowerCase() === "actors");
+  const actorsLi  = actorsBtn?.closest("li");
+  if (actorsLi) {
+    console.log("RP Distributor | inserting before actors tab");
+    menu.insertBefore(li, actorsLi);
+  } else {
+    console.warn("RP Distributor | actors tab not found, appending to end");
+    menu.appendChild(li);
+  }
+
+  // When any native sidebar tab is clicked, strip our active class so
+  // Foundry's own show/hide logic is no longer blocked by our CSS rule.
+  menu.querySelectorAll("button[data-action='tab']").forEach(nativeBtn => {
+    if (nativeBtn.dataset.tab === TAB_NAME) return; // skip our own button
+    nativeBtn.addEventListener("click", _deactivateTab);
+  });
 
   const panel = document.createElement("div");
   panel.setAttribute("data-tab",   TAB_NAME);
   panel.setAttribute("data-group", "primary");
   panel.setAttribute("id",         TAB_NAME);
   panel.setAttribute("role",       "tabpanel");
-  panel.style.cssText = "width:100%;max-width:100%;box-sizing:border-box;";
   sidebarContent.appendChild(panel);
 
   await _renderPanel(panel);

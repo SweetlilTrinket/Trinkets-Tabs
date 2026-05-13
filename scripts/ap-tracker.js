@@ -93,15 +93,12 @@ async function replenishAP(combatant) {
 }
 
 // Hook: fires when the active combatant changes.
-// prevData.turn = the turn index that just ENDED.
-// combat.turn   = the turn index that is NOW STARTING.
-// We replenish AP for the combatant NOW starting their turn.
-// Hook: fires when the active combatant changes.
-// In Foundry v13, combat.turn still holds the OLD index when this hook fires.
-// The NEW (just-starting) combatant is at prevData.turn + 1.
+// In Foundry v13, prevData.turn is the NEW (now-starting) turn index,
+// and combat.turn is the OLD index that just ended.
+// The combatant NOW starting their turn is at combat.turn + 1.
 Hooks.on("combatTurn", (combat, prevData, { direction }) => {
   if (direction < 1) return;
-  const newIndex = prevData.turn + 1;
+  const newIndex = combat.turn + 1;
   const combatant = combat.turns[newIndex] ?? combat.turns[0]; // wrap round end
   if (!combatant) return;
   replenishAP(combatant);
