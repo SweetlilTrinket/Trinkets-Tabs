@@ -31,4 +31,5 @@
   ],
   "system": ["zweihander"],
   "flags": {}
+  "manifest": "https://raw.githubusercontent.com/SweetlilTrinket/Trinkets-Tabs/refs/heads/main/module.json"
 }
