@@ -25,13 +25,6 @@
     "styles/luck-tab.css",
     "styles/rp-distributor.css"
   ],
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "lang/en.json"
-    }
-  ],
   "system": ["zweihander"],
   "flags": {}
 }
