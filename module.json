@@ -30,8 +30,8 @@
     }
   ],
   "system": ["zweihander"],
-  "flags": {}
-  "url": "https://github.com/SweetlilTrinket/Trinkets-Tabs.git"
-  "manifest": "https://raw.githubusercontent.com/SweetlilTrinket/Trinkets-Tabs/refs/heads/main/module.json"
+  "flags": {},
+  "url": "https://github.com/SweetlilTrinket/Trinkets-Tabs.git",
+  "manifest": "https://raw.githubusercontent.com/SweetlilTrinket/Trinkets-Tabs/refs/heads/main/module.json",
   "download": "https://github.com/SweetlilTrinket/Trinkets-Tabs/archive/refs/heads/main.zip"
 }
