@@ -5,6 +5,7 @@
 // ============================================================
 
 import { getAP, setAP, spendAP, resolveAPCost, MAX_AP, AP_FLAG } from "./ap-tracker.js";
+import { isLuckEnabled } from "./settings.js";
 
 const MODULE_ID = "trinket-tabs";
 const FLAG_KEY  = "luck";
@@ -321,16 +322,16 @@ const COMBAT_ACTIONS = {
 
   "Hustle": {
     card: `
-<div style="border:2px solid #8b0000;border-radius:6px;background:#1a1a1a;color:#e8d5a3;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#8b0000;color:#e8d5a3;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🏃 HUSTLE</div>
+<div style="border:2px solid #1a6b2a;border-radius:6px;background:#0d1a0d;color:#a3e8b0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#1a6b2a;color:#a3e8b0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🏃 HUSTLE</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#c0a060;margin-bottom:10px;">
-    Move at <strong style="color:#e8d5a3;">×1 Movement</strong>.
+  <div style="font-size:0.85em;color:#80b890;margin-bottom:10px;">
+    Move at <strong style="color:#a3e8b0;">×1 Movement</strong>.
   </div>
-  <div style="background:#2a0000;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="background:#002a00;border:1px solid #1a6b2a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#99ff99;">
     ⚠ Invokes an <strong>Opportunity Attack</strong> if moving out of an Engagement.
   </div>
 </div>`,
@@ -341,16 +342,16 @@ const COMBAT_ACTIONS = {
 
   "Run": {
     card: `
-<div style="border:2px solid #8b0000;border-radius:6px;background:#1a1a1a;color:#e8d5a3;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#8b0000;color:#e8d5a3;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">💨 RUN</div>
+<div style="border:2px solid #1a6b2a;border-radius:6px;background:#0d1a0d;color:#a3e8b0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#1a6b2a;color:#a3e8b0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">💨 RUN</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">3 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#c0a060;margin-bottom:10px;">
-    Move at <strong style="color:#e8d5a3;">×3 Movement</strong> and gain <strong style="color:#e8d5a3;">+3 Damage Threshold</strong>.
+  <div style="font-size:0.85em;color:#80b890;margin-bottom:10px;">
+    Move at <strong style="color:#a3e8b0;">×3 Movement</strong> and gain <strong style="color:#a3e8b0;">+3 Damage Threshold</strong>.
   </div>
-  <div style="background:#2a0000;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="background:#002a00;border:1px solid #1a6b2a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#99ff99;">
     ⚠ Invokes an <strong>Opportunity Attack</strong> if moving out of an Engagement.
   </div>
 </div>`,
@@ -361,14 +362,14 @@ const COMBAT_ACTIONS = {
 
   "Maneuver": {
     card: `
-<div style="border:2px solid #8b0000;border-radius:6px;background:#1a1a1a;color:#e8d5a3;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#8b0000;color:#e8d5a3;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🔄 MANEUVER</div>
+<div style="border:2px solid #1a6b2a;border-radius:6px;background:#0d1a0d;color:#a3e8b0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#1a6b2a;color:#a3e8b0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🔄 MANEUVER</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#c0a060;margin-bottom:10px;">
-    Move <strong style="color:#e8d5a3;">1 yard</strong> out of an Engagement.
+  <div style="font-size:0.85em;color:#80b890;margin-bottom:10px;">
+    Move <strong style="color:#a3e8b0;">1 yard</strong> out of an Engagement.
   </div>
   <div style="background:#1a2a1a;border:1px solid #2a6b2a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#99ff99;">
     ✔ Avoids <strong>all Opportunity Attacks</strong>.
@@ -381,16 +382,16 @@ const COMBAT_ACTIONS = {
 
   "Get Up": {
     card: `
-<div style="border:2px solid #8b0000;border-radius:6px;background:#1a1a1a;color:#e8d5a3;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#8b0000;color:#e8d5a3;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🛡 GET UP</div>
+<div style="border:2px solid #1a6b2a;border-radius:6px;background:#0d1a0d;color:#a3e8b0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#1a6b2a;color:#a3e8b0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🛡 GET UP</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#c0a060;margin-bottom:10px;">
-    Stand up from <strong style="color:#e8d5a3;">Prone</strong> and move 1 yard, step into a vehicle or mount an animal.
+  <div style="font-size:0.85em;color:#80b890;margin-bottom:10px;">
+    Stand up from <strong style="color:#a3e8b0;">Prone</strong> and move 1 yard, step into a vehicle or mount an animal.
   </div>
-  <div style="background:#2a0000;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="background:#002a00;border:1px solid #1a6b2a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#99ff99;">
     ⚠ Invokes an <strong>Opportunity Attack</strong> if moving out of an Engagement.
   </div>
 </div>`,
@@ -401,17 +402,17 @@ const COMBAT_ACTIONS = {
 
   "Take Cover": {
     card: `
-<div style="border:2px solid #8b0000;border-radius:6px;background:#1a1a1a;color:#e8d5a3;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#8b0000;color:#e8d5a3;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🪨 TAKE COVER</div>
+<div style="border:2px solid #1a6b2a;border-radius:6px;background:#0d1a0d;color:#a3e8b0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#1a6b2a;color:#a3e8b0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🪨 TAKE COVER</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#c0a060;margin-bottom:6px;">
+  <div style="font-size:0.85em;color:#80b890;margin-bottom:6px;">
     Choose cover height for Damage Threshold bonus.
   </div>
-  <div style="font-size:0.8em;color:#c0a060;margin-bottom:4px;">Low +3 &nbsp;|&nbsp; Medium +6 &nbsp;|&nbsp; High +9</div>
-  <div style="background:#2a0000;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="font-size:0.8em;color:#80b890;margin-bottom:4px;">Low +3 &nbsp;|&nbsp; Medium +6 &nbsp;|&nbsp; High +9</div>
+  <div style="background:#002a00;border:1px solid #1a6b2a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#99ff99;">
     ⚠ Invokes an <strong>Opportunity Attack</strong> if moving out of an Engagement.
   </div>
 </div>`,
@@ -441,18 +442,18 @@ const COMBAT_ACTIONS = {
       };
       const cover = coverMap[coverOptions];
       const card = `
-<div style="border:2px solid #8b0000;border-radius:6px;background:#1a1a1a;color:#e8d5a3;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#8b0000;color:#e8d5a3;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🪨 TAKE COVER</div>
+<div style="border:2px solid #1a6b2a;border-radius:6px;background:#0d1a0d;color:#a3e8b0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#1a6b2a;color:#a3e8b0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🪨 TAKE COVER</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#c0a060;margin-bottom:10px;">
-    Take cover 1 yard away behind <strong style="color:#e8d5a3;">${cover.label}</strong>.
+  <div style="font-size:0.85em;color:#80b890;margin-bottom:10px;">
+    Take cover 1 yard away behind <strong style="color:#a3e8b0;">${cover.label}</strong>.
   </div>
-  <div style="text-align:center;font-size:0.8em;color:#c0a060;margin-bottom:4px;">DAMAGE THRESHOLD BONUS</div>
-  <div style="text-align:center;font-size:2em;font-weight:bold;color:${cover.color};background:#2a0000;border:2px solid #8b0000;border-radius:6px;padding:4px;margin-bottom:10px;">${cover.bonus}</div>
-  <div style="background:#2a0000;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="text-align:center;font-size:0.8em;color:#80b890;margin-bottom:4px;">DAMAGE THRESHOLD BONUS</div>
+  <div style="text-align:center;font-size:2em;font-weight:bold;color:${cover.color};background:#002a00;border:2px solid #1a6b2a;border-radius:6px;padding:4px;margin-bottom:10px;">${cover.bonus}</div>
+  <div style="background:#002a00;border:1px solid #1a6b2a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#99ff99;">
     ⚠ Invokes an <strong>Opportunity Attack</strong> if moving out of an Engagement.
   </div>
 </div>`;
@@ -462,16 +463,16 @@ const COMBAT_ACTIONS = {
 
   "Charge": {
     card: `
-<div style="border:2px solid #8b0000;border-radius:6px;background:#1a1a1a;color:#e8d5a3;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#8b0000;color:#e8d5a3;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⚔ CHARGE</div>
+<div style="border:2px solid #1a6b2a;border-radius:6px;background:#0d1a0d;color:#a3e8b0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#1a6b2a;color:#a3e8b0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⚔ CHARGE</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#c0a060;margin-bottom:10px;border-bottom:1px solid #5a2a2a;padding-bottom:8px;">
+  <div style="font-size:0.85em;color:#80b890;margin-bottom:10px;border-bottom:1px solid #2a5a2a;padding-bottom:8px;">
     Move at ×2 Movement. Invokes an Opportunity Attack if moving out of an Engagement.
   </div>
-  <div style="font-size:0.85em;color:#c0a060;text-align:center;">Rolls an exploding Fury Die — add result to next attack Damage.</div>
+  <div style="font-size:0.85em;color:#80b890;text-align:center;">Rolls an exploding Fury Die — add result to next attack Damage.</div>
 </div>`,
     run: async (actor) => {
       const fury = await rollFuryDie();
@@ -481,20 +482,20 @@ const COMBAT_ACTIONS = {
         ? `<div style="text-align:center;font-size:0.8em;color:#ffaa00;margin-bottom:6px;">🔥 FURY DIE EXPLODED! Rolled ${fury.rolls.length}x</div>`
         : "";
       const card = `
-<div style="border:2px solid #8b0000;border-radius:6px;background:#1a1a1a;color:#e8d5a3;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#8b0000;color:#e8d5a3;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⚔ CHARGE</div>
+<div style="border:2px solid #1a6b2a;border-radius:6px;background:#0d1a0d;color:#a3e8b0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#1a6b2a;color:#a3e8b0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⚔ CHARGE</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
-    <span style="background:#3a1a1a;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">MOVEMENT ACTION</span>
+    <span style="background:#1a3a1a;border:1px solid #1a6b2a;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#c0a060;margin-bottom:10px;border-bottom:1px solid #5a2a2a;padding-bottom:8px;">
+  <div style="font-size:0.85em;color:#80b890;margin-bottom:10px;border-bottom:1px solid #2a5a2a;padding-bottom:8px;">
     Move at ×2 Movement. Invokes an Opportunity Attack if moving out of an Engagement.
   </div>
-  <div style="text-align:center;margin-bottom:6px;font-size:0.85em;color:#c0a060;">FURY DIE RESULT</div>
+  <div style="text-align:center;margin-bottom:6px;font-size:0.85em;color:#80b890;">FURY DIE RESULT</div>
   ${explosionNote}
-  <div style="text-align:center;font-size:2.2em;font-weight:bold;color:${fury.exploded ? "#ffaa00" : "#ff4444"};background:#2a0000;border:2px solid ${fury.exploded ? "#ffaa00" : "#8b0000"};border-radius:6px;padding:6px;margin-bottom:6px;text-shadow:0 0 8px ${fury.exploded ? "#ffaa00aa" : "#ff0000aa"};">+${fury.total}</div>
+  <div style="text-align:center;font-size:2.2em;font-weight:bold;color:${fury.exploded ? "#ffaa00" : "#ff4444"};background:#002a00;border:2px solid ${fury.exploded ? "#ffaa00" : "#1a6b2a"};border-radius:6px;padding:6px;margin-bottom:6px;text-shadow:0 0 8px ${fury.exploded ? "#ffaa00aa" : "#ff0000aa"};">+${fury.total}</div>
   <div style="text-align:center;font-size:0.75em;color:#888;margin-bottom:8px;">🎲 ${diceBreakdown}</div>
-  <div style="font-size:0.8em;color:#a08050;text-align:center;">Add <strong style="color:#e8d5a3;">${fury.total}</strong> to your Damage on this attack.</div>
+  <div style="font-size:0.8em;color:#a08050;text-align:center;">Add <strong style="color:#a3e8b0;">${fury.total}</strong> to your Damage on this attack.</div>
 </div>`;
       ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: card, rollMode: game.settings.get("core", "rollMode") });
     },
@@ -504,18 +505,18 @@ const COMBAT_ACTIONS = {
 
   "Melee Attack": {
     card: `
-<div style="border:2px solid #1a4a6b;border-radius:6px;background:#0d1a24;color:#d0e8f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#1a4a6b;color:#d0e8f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⚔ MELEE ATTACK</div>
+<div style="border:2px solid #8b0000;border-radius:6px;background:#1a0d0d;color:#f0d0d0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#8b0000;color:#f0d0d0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⚔ MELEE ATTACK</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#a0c8e0;margin-bottom:10px;">
-    Make a <strong style="color:#d0e8f0;">Combat-based Skill Test</strong>. On success, refer to <strong style="color:#d0e8f0;">[CB]</strong> and add <strong style="color:#d0e8f0;">1D6 Fury Die</strong> for Total Damage.
+  <div style="font-size:0.85em;color:#e0a0a0;margin-bottom:10px;">
+    Make a <strong style="color:#f0d0d0;">Combat-based Skill Test</strong>. On success, refer to <strong style="color:#f0d0d0;">[CB]</strong> and add <strong style="color:#f0d0d0;">1D6 Fury Die</strong> for Total Damage.
   </div>
-  <div style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#6a9ab0;">
-    ⚠ Foe may attempt to <strong style="color:#a0c8e0;">Parry</strong>.<br>
-    ⚠ Cannot attack outside an Engagement unless weapon has <strong style="color:#a0c8e0;">Reach</strong>.
+  <div style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#b06a6a;">
+    ⚠ Foe may attempt to <strong style="color:#e0a0a0;">Parry</strong>.<br>
+    ⚠ Cannot attack outside an Engagement unless weapon has <strong style="color:#e0a0a0;">Reach</strong>.
   </div>
 </div>`,
     run: async (actor) => {
@@ -526,9 +527,9 @@ const COMBAT_ACTIONS = {
         title: "⚔ Melee Attack Setup",
         content: `
           <style>
-            #melee-dialog { font-family:'Palatino Linotype',serif;color:#d0e8f0;background:#0d1a24;padding:8px; }
-            #melee-dialog label { display:block;font-size:0.82em;color:#88b8d0;margin-bottom:3px;margin-top:10px; }
-            #melee-dialog select { width:100%;background:#0d2233;border:1px solid #1a4a6b;color:#d0e8f0;border-radius:4px;padding:4px 8px;font-family:inherit; }
+            #melee-dialog { font-family:'Palatino Linotype',serif;color:#f0d0d0;background:#1a0d0d;padding:8px; }
+            #melee-dialog label { display:block;font-size:0.82em;color:#d08888;margin-bottom:3px;margin-top:10px; }
+            #melee-dialog select { width:100%;background:#2a0d0d;border:1px solid #8b0000;color:#f0d0d0;border-radius:4px;padding:4px 8px;font-family:inherit; }
           </style>
           <div id="melee-dialog">
             <label>Select Weapon</label>
@@ -541,19 +542,19 @@ const COMBAT_ACTIONS = {
             callback: async (html) => {
               const weapon = weapons[parseInt(html.find("#weapon-select").val())];
               const card = `
-<div style="border:2px solid #1a4a6b;border-radius:6px;background:#0d1a24;color:#d0e8f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#1a4a6b;color:#d0e8f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⚔ MELEE ATTACK</div>
+<div style="border:2px solid #8b0000;border-radius:6px;background:#1a0d0d;color:#f0d0d0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#8b0000;color:#f0d0d0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⚔ MELEE ATTACK</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
-  <div style="font-size:0.8em;color:#88b8d0;margin-bottom:6px;"><strong style="color:#d0e8f0;">Weapon:</strong> ${weapon.name}</div>
-  <div style="font-size:0.85em;color:#a0c8e0;margin-bottom:10px;">
-    Make a <strong style="color:#d0e8f0;">Combat-based Skill Test</strong>. On success, refer to <strong style="color:#d0e8f0;">[CB]</strong> and add <strong style="color:#d0e8f0;">1D6 Fury Die</strong> for Total Damage.
+  <div style="font-size:0.8em;color:#d08888;margin-bottom:6px;"><strong style="color:#f0d0d0;">Weapon:</strong> ${weapon.name}</div>
+  <div style="font-size:0.85em;color:#e0a0a0;margin-bottom:10px;">
+    Make a <strong style="color:#f0d0d0;">Combat-based Skill Test</strong>. On success, refer to <strong style="color:#f0d0d0;">[CB]</strong> and add <strong style="color:#f0d0d0;">1D6 Fury Die</strong> for Total Damage.
   </div>
-  <div style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#6a9ab0;">
-    ⚠ Foe may attempt to <strong style="color:#a0c8e0;">Parry</strong>.<br>
-    ⚠ Cannot attack outside an Engagement unless weapon has <strong style="color:#a0c8e0;">Reach</strong>.
+  <div style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#b06a6a;">
+    ⚠ Foe may attempt to <strong style="color:#e0a0a0;">Parry</strong>.<br>
+    ⚠ Cannot attack outside an Engagement unless weapon has <strong style="color:#e0a0a0;">Reach</strong>.
   </div>
 </div>`;
               ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: card });
@@ -568,19 +569,19 @@ const COMBAT_ACTIONS = {
 
   "Ranged Attack": {
     card: `
-<div style="border:2px solid #1a4a6b;border-radius:6px;background:#0d1a24;color:#d0e8f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#1a4a6b;color:#d0e8f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🏹 RANGED ATTACK</div>
+<div style="border:2px solid #8b0000;border-radius:6px;background:#1a0d0d;color:#f0d0d0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#8b0000;color:#f0d0d0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🏹 RANGED ATTACK</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#a0c8e0;margin-bottom:10px;">
-    Make a <strong style="color:#d0e8f0;">Combat-based Skill Test</strong>. On success, refer to <strong style="color:#d0e8f0;">[CB]</strong> and add <strong style="color:#d0e8f0;">1D6 Fury Die</strong> for Total Damage.
+  <div style="font-size:0.85em;color:#e0a0a0;margin-bottom:10px;">
+    Make a <strong style="color:#f0d0d0;">Combat-based Skill Test</strong>. On success, refer to <strong style="color:#f0d0d0;">[CB]</strong> and add <strong style="color:#f0d0d0;">1D6 Fury Die</strong> for Total Damage.
   </div>
-  <div style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#6a9ab0;">
-    ⚠ Foe may <strong style="color:#a0c8e0;">Dodge</strong> or <strong style="color:#a0c8e0;">Parry with a shield</strong>.<br>
-    ⚠ Cannot be used in an Engagement unless weapon has <strong style="color:#a0c8e0;">Gunpowder</strong> quality.<br>
-    ⚠ Weapon must be <strong style="color:#a0c8e0;">loaded</strong> to fire.
+  <div style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#b06a6a;">
+    ⚠ Foe may <strong style="color:#e0a0a0;">Dodge</strong> or <strong style="color:#e0a0a0;">Parry with a shield</strong>.<br>
+    ⚠ Cannot be used in an Engagement unless weapon has <strong style="color:#e0a0a0;">Gunpowder</strong> quality.<br>
+    ⚠ Weapon must be <strong style="color:#e0a0a0;">loaded</strong> to fire.
   </div>
 </div>`,
     run: async (actor) => {
@@ -591,9 +592,9 @@ const COMBAT_ACTIONS = {
         title: "🏹 Ranged Attack Setup",
         content: `
           <style>
-            #ranged-dialog { font-family:'Palatino Linotype',serif;color:#d0e8f0;background:#0d1a24;padding:8px; }
-            #ranged-dialog label { display:block;font-size:0.82em;color:#88b8d0;margin-bottom:3px;margin-top:10px; }
-            #ranged-dialog select { width:100%;background:#0d2233;border:1px solid #1a4a6b;color:#d0e8f0;border-radius:4px;padding:4px 8px;font-family:inherit; }
+            #ranged-dialog { font-family:'Palatino Linotype',serif;color:#f0d0d0;background:#1a0d0d;padding:8px; }
+            #ranged-dialog label { display:block;font-size:0.82em;color:#d08888;margin-bottom:3px;margin-top:10px; }
+            #ranged-dialog select { width:100%;background:#2a0d0d;border:1px solid #8b0000;color:#f0d0d0;border-radius:4px;padding:4px 8px;font-family:inherit; }
           </style>
           <div id="ranged-dialog">
             <label>Select Weapon</label>
@@ -606,20 +607,20 @@ const COMBAT_ACTIONS = {
             callback: async (html) => {
               const weapon = weapons[parseInt(html.find("#weapon-select").val())];
               const card = `
-<div style="border:2px solid #1a4a6b;border-radius:6px;background:#0d1a24;color:#d0e8f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#1a4a6b;color:#d0e8f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🏹 RANGED ATTACK</div>
+<div style="border:2px solid #8b0000;border-radius:6px;background:#1a0d0d;color:#f0d0d0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#8b0000;color:#f0d0d0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🏹 RANGED ATTACK</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
-  <div style="font-size:0.8em;color:#88b8d0;margin-bottom:6px;"><strong style="color:#d0e8f0;">Weapon:</strong> ${weapon.name}</div>
-  <div style="font-size:0.85em;color:#a0c8e0;margin-bottom:10px;">
-    Make a <strong style="color:#d0e8f0;">Combat-based Skill Test</strong>. On success, refer to <strong style="color:#d0e8f0;">[CB]</strong> and add <strong style="color:#d0e8f0;">1D6 Fury Die</strong> for Total Damage.
+  <div style="font-size:0.8em;color:#d08888;margin-bottom:6px;"><strong style="color:#f0d0d0;">Weapon:</strong> ${weapon.name}</div>
+  <div style="font-size:0.85em;color:#e0a0a0;margin-bottom:10px;">
+    Make a <strong style="color:#f0d0d0;">Combat-based Skill Test</strong>. On success, refer to <strong style="color:#f0d0d0;">[CB]</strong> and add <strong style="color:#f0d0d0;">1D6 Fury Die</strong> for Total Damage.
   </div>
-  <div style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#6a9ab0;">
-    ⚠ Foe may <strong style="color:#a0c8e0;">Dodge</strong> or <strong style="color:#a0c8e0;">Parry with a shield</strong>.<br>
-    ⚠ Cannot be used in an Engagement unless weapon has <strong style="color:#a0c8e0;">Gunpowder</strong> quality.<br>
-    ⚠ Weapon must be <strong style="color:#a0c8e0;">loaded</strong> to fire.
+  <div style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#b06a6a;">
+    ⚠ Foe may <strong style="color:#e0a0a0;">Dodge</strong> or <strong style="color:#e0a0a0;">Parry with a shield</strong>.<br>
+    ⚠ Cannot be used in an Engagement unless weapon has <strong style="color:#e0a0a0;">Gunpowder</strong> quality.<br>
+    ⚠ Weapon must be <strong style="color:#e0a0a0;">loaded</strong> to fire.
   </div>
 </div>`;
               ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: card });
@@ -634,19 +635,19 @@ const COMBAT_ACTIONS = {
 
   "Cast Magic": {
     card: `
-<div style="border:2px solid #1a4a6b;border-radius:6px;background:#0d1a24;color:#d0e8f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#1a4a6b;color:#d0e8f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">✨ CAST MAGICK</div>
+<div style="border:2px solid #8b0000;border-radius:6px;background:#1a0d0d;color:#f0d0d0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#8b0000;color:#f0d0d0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">✨ CAST MAGICK</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">VARIES</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">VARIES</span>
   </div>
-  <div style="font-size:0.85em;color:#a0c8e0;margin-bottom:10px;">
-    Make an <strong style="color:#d0e8f0;">Incantation Test</strong>. See your Grimoire for specific spell effects.
+  <div style="font-size:0.85em;color:#e0a0a0;margin-bottom:10px;">
+    Make an <strong style="color:#f0d0d0;">Incantation Test</strong>. See your Grimoire for specific spell effects.
   </div>
-  <div style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#6a9ab0;">
-    📖 <strong style="color:#a0c8e0;">Generalist &amp; Petty Magicks:</strong> 1 AP<br>
-    📖 <strong style="color:#a0c8e0;">Lesser Magicks:</strong> 2 AP<br>
-    📖 <strong style="color:#a0c8e0;">Greater Magicks:</strong> 3 AP
+  <div style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#b06a6a;">
+    📖 <strong style="color:#e0a0a0;">Generalist &amp; Petty Magicks:</strong> 1 AP<br>
+    📖 <strong style="color:#e0a0a0;">Lesser Magicks:</strong> 2 AP<br>
+    📖 <strong style="color:#e0a0a0;">Greater Magicks:</strong> 3 AP
   </div>
 </div>`,
     run: async (actor) => {
@@ -657,9 +658,9 @@ const COMBAT_ACTIONS = {
         new Dialog({
           title: "✨ Cast Magick — Choose Spell",
           content: `
-            <style>#cm-dialog{font-family:'Palatino Linotype',serif;color:#d0e8f0;background:#0d1a24;padding:8px;}
-            #cm-dialog label{display:block;font-size:0.82em;color:#88b8d0;margin-bottom:3px;margin-top:10px;}
-            #cm-dialog select{width:100%;background:#0d2233;border:1px solid #1a4a6b;color:#d0e8f0;border-radius:4px;padding:4px 8px;font-family:inherit;}</style>
+            <style>#cm-dialog{font-family:'Palatino Linotype',serif;color:#f0d0d0;background:#1a0d0d;padding:8px;}
+            #cm-dialog label{display:block;font-size:0.82em;color:#d08888;margin-bottom:3px;margin-top:10px;}
+            #cm-dialog select{width:100%;background:#2a0d0d;border:1px solid #8b0000;color:#f0d0d0;border-radius:4px;padding:4px 8px;font-family:inherit;}</style>
             <div id="cm-dialog"><label>Select Spell</label>
             <select id="spell-select">${spellOptions}</select></div>`,
           buttons: {
@@ -685,23 +686,23 @@ const COMBAT_ACTIONS = {
 
   "Called Shot": {
     card: `
-<div style="border:2px solid #1a4a6b;border-radius:6px;background:#0d1a24;color:#d0e8f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#1a4a6b;color:#d0e8f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🎯 CALLED SHOT</div>
+<div style="border:2px solid #8b0000;border-radius:6px;background:#1a0d0d;color:#f0d0d0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#8b0000;color:#f0d0d0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🎯 CALLED SHOT</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#a0c8e0;margin-bottom:6px;">
+  <div style="font-size:0.85em;color:#e0a0a0;margin-bottom:6px;">
     Arms/Body −10% +1 Fury Die &nbsp;|&nbsp; Legs −20% +1 Fury Die + Prone &nbsp;|&nbsp; Head −30% +2 Fury Dice
   </div>
-  <div style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#6a9ab0;">
-    ⚠ Foe <strong style="color:#a0c8e0;">cannot Dodge or Parry</strong>.
+  <div style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#b06a6a;">
+    ⚠ Foe <strong style="color:#e0a0a0;">cannot Dodge or Parry</strong>.
   </div>
 </div>`,
     run: async (actor) => {
       const locationMap = {
-        arms: { label: "Arms", penalty: "-10%", modifier: -10, color: "#6a9ab0", extra: "🎲 Add <strong>1 Fury Die</strong> to damage on a successful hit." },
-        body: { label: "Body", penalty: "-10%", modifier: -10, color: "#6a9ab0", extra: "🎲 Add <strong>1 Fury Die</strong> to damage on a successful hit." },
+        arms: { label: "Arms", penalty: "-10%", modifier: -10, color: "#b06a6a", extra: "🎲 Add <strong>1 Fury Die</strong> to damage on a successful hit." },
+        body: { label: "Body", penalty: "-10%", modifier: -10, color: "#b06a6a", extra: "🎲 Add <strong>1 Fury Die</strong> to damage on a successful hit." },
         legs: { label: "Legs", penalty: "-20%", modifier: -20, color: "#c8a000", extra: "🦵 Foe knocked <strong>Prone</strong> on a successful hit.<br>🎲 Add <strong>1 Fury Die</strong> to damage on a successful hit." },
         head: { label: "Head", penalty: "-30%", modifier: -30, color: "#c84000", extra: "💀 Add <strong>2 Fury Dice</strong> to damage on a successful hit." },
       };
@@ -735,7 +736,7 @@ const COMBAT_ACTIONS = {
           content: `
             <div style="font-family:'Palatino Linotype',serif;padding:4px 0 8px;">
               <p style="margin-bottom:8px;">Which weapon are you using?</p>
-              <select name="weapon" style="width:100%;padding:4px;font-family:'Palatino Linotype',serif;background:#0d2233;color:#d0e8f0;border:1px solid #1a4a6b;border-radius:4px;">
+              <select name="weapon" style="width:100%;padding:4px;font-family:'Palatino Linotype',serif;background:#2a0d0d;color:#f0d0d0;border:1px solid #8b0000;border-radius:4px;">
                 ${weaponOptions}
               </select>
             </div>`,
@@ -750,21 +751,21 @@ const COMBAT_ACTIONS = {
       const weapon = actor.items.get(weaponId);
 
       const card = `
-<div style="border:2px solid #1a4a6b;border-radius:6px;background:#0d1a24;color:#d0e8f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#1a4a6b;color:#d0e8f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🎯 CALLED SHOT</div>
+<div style="border:2px solid #8b0000;border-radius:6px;background:#1a0d0d;color:#f0d0d0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#8b0000;color:#f0d0d0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🎯 CALLED SHOT</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
-    <span style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">ATTACK ACTION</span>
+    <span style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:2px 10px;font-size:0.9em;">2 AP</span>
   </div>
-  <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">Weapon: <strong style="color:#d0e8f0;">${weapon.name}</strong></div>
-  <div style="display:flex;justify-content:space-between;align-items:center;background:#0d2233;border:2px solid #1a4a6b;border-radius:6px;padding:6px 14px;margin-bottom:10px;">
-    <span style="font-size:1.3em;font-weight:bold;color:#d0e8f0;">${loc.label}</span>
+  <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">Weapon: <strong style="color:#f0d0d0;">${weapon.name}</strong></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;background:#2a0d0d;border:2px solid #8b0000;border-radius:6px;padding:6px 14px;margin-bottom:10px;">
+    <span style="font-size:1.3em;font-weight:bold;color:#f0d0d0;">${loc.label}</span>
     <span style="font-size:1.2em;font-weight:bold;color:${loc.color};">${loc.penalty} to Skill</span>
   </div>
-  <div style="background:#0d2233;border:1px solid ${loc.color};border-radius:4px;padding:6px 10px;font-size:0.85em;color:#d0e8f0;margin-bottom:10px;text-align:center;">${loc.extra}</div>
-  <div style="background:#0d2233;border:1px solid #1a4a6b;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#6a9ab0;">
-    ⚠ Foe <strong style="color:#a0c8e0;">cannot Dodge or Parry</strong>.<br>
-    ⚠ Ranged requires <strong style="color:#a0c8e0;">Gunpowder</strong> quality if in Engagement. Weapon must be loaded.
+  <div style="background:#2a0d0d;border:1px solid ${loc.color};border-radius:4px;padding:6px 10px;font-size:0.85em;color:#f0d0d0;margin-bottom:10px;text-align:center;">${loc.extra}</div>
+  <div style="background:#2a0d0d;border:1px solid #8b0000;border-radius:4px;padding:6px 10px;font-size:0.78em;color:#b06a6a;">
+    ⚠ Foe <strong style="color:#e0a0a0;">cannot Dodge or Parry</strong>.<br>
+    ⚠ Ranged requires <strong style="color:#e0a0a0;">Gunpowder</strong> quality if in Engagement. Weapon must be loaded.
   </div>
 </div>`;
       await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor }), content: card });
@@ -776,19 +777,19 @@ const COMBAT_ACTIONS = {
 
   "Chokehold": {
     card: `
-<div style="border:2px solid #6a0dad;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#6a0dad;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🤜 CHOKEHOLD</div>
+<div style="border:2px solid #7722aa;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#5c1a8a;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🤜 CHOKEHOLD</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#c0a0d8;margin-bottom:8px;">
     Make an <strong style="color:#e8d0f0;">Athletics Test</strong>. Foe must <strong style="color:#e8d0f0;">Resist Athletics</strong> or be <strong style="color:#e8d0f0;">Choked</strong>.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;margin-bottom:6px;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;margin-bottom:6px;">
     💀 On failure, foe suffers <strong style="color:#e8d0f0;">1D10+[BB] Peril</strong> immediately.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     🔁 Peril is reapplied <strong style="color:#e8d0f0;">each of your Turns</strong> while the hold is maintained, until Resisted.
   </div>
 </div>`,
@@ -800,16 +801,16 @@ const COMBAT_ACTIONS = {
 
   "Dirty Tricks": {
     card: `
-<div style="border:2px solid #6a0dad;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#6a0dad;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🃏 DIRTY TRICKS</div>
+<div style="border:2px solid #7722aa;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#5c1a8a;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🃏 DIRTY TRICKS</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#c0a0d8;margin-bottom:8px;">
     Make a <strong style="color:#e8d0f0;">Guile Test</strong>. Foe must <strong style="color:#e8d0f0;">Resist Awareness</strong> or be <strong style="color:#e8d0f0;">Blinded</strong>.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ⚠ While Blinded, foe <strong style="color:#e8d0f0;">cannot Counterspell, Dodge or Parry</strong> until their next Turn.
   </div>
 </div>`,
@@ -821,16 +822,16 @@ const COMBAT_ACTIONS = {
 
   "Disarm": {
     card: `
-<div style="border:2px solid #6a0dad;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#6a0dad;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🗡 DISARM</div>
+<div style="border:2px solid #7722aa;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#5c1a8a;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🗡 DISARM</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#c0a0d8;margin-bottom:8px;">
     Make a <strong style="color:#e8d0f0;">Coordination Test</strong>. Foe must <strong style="color:#e8d0f0;">Resist Coordination</strong> or be <strong style="color:#e8d0f0;">Disarmed</strong>.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ⚠ Foe <strong style="color:#e8d0f0;">loses their weapon</strong> and cannot use their primary hand until next Turn.
   </div>
 </div>`,
@@ -842,19 +843,19 @@ const COMBAT_ACTIONS = {
 
   "Knockout": {
     card: `
-<div style="border:2px solid #6a0dad;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#6a0dad;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">👊 KNOCKOUT</div>
+<div style="border:2px solid #7722aa;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#5c1a8a;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">👊 KNOCKOUT</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#c0a0d8;margin-bottom:8px;">
     Foe must be <strong style="color:#e8d0f0;">Defenseless or Surprised</strong>. Make an <strong style="color:#e8d0f0;">Athletics Test</strong> or foe is <strong style="color:#e8d0f0;">Knocked Out</strong>.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;margin-bottom:6px;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;margin-bottom:6px;">
     😴 Foe is left <strong style="color:#e8d0f0;">Helpless</strong> and rendered <strong style="color:#e8d0f0;">unconscious</strong> for <strong style="color:#e8d0f0;">[BB] Turns</strong>.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     💀 Foe suffers <strong style="color:#e8d0f0;">2D10+[BB] Peril</strong> on failure.
   </div>
 </div>`,
@@ -866,16 +867,16 @@ const COMBAT_ACTIONS = {
 
   "Splinter Shield": {
     card: `
-<div style="border:2px solid #6a0dad;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#6a0dad;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🛡 SPLINTER SHIELD</div>
+<div style="border:2px solid #7722aa;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#5c1a8a;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🛡 SPLINTER SHIELD</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#c0a0d8;margin-bottom:8px;">
     Make a <strong style="color:#e8d0f0;">Combat-based Skill Test</strong>. Foe must <strong style="color:#e8d0f0;">Resist Toughness</strong> or their shield is <strong style="color:#e8d0f0;">Ruined!</strong>
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
     💥 On success, the foe's shield is <strong style="color:#ffcccc;">permanently destroyed</strong>.
   </div>
 </div>`,
@@ -888,7 +889,7 @@ const COMBAT_ACTIONS = {
         content: `
           <style>#ss-dialog{font-family:'Palatino Linotype',serif;color:#e8d0f0;background:#110d1a;padding:8px;}
           #ss-dialog label{display:block;font-size:0.82em;color:#c0a0d8;margin-bottom:3px;margin-top:10px;}
-          #ss-dialog select{width:100%;background:#1d0d2e;border:1px solid #6a0dad;color:#e8d0f0;border-radius:4px;padding:4px 8px;font-family:inherit;}</style>
+          #ss-dialog select{width:100%;background:#1e0a30;border:1px solid #7722aa;color:#e8d0f0;border-radius:4px;padding:4px 8px;font-family:inherit;}</style>
           <div id="ss-dialog"><label>Select Weapon</label>
           <select id="weapon-select">${weaponOptions}</select></div>`,
         buttons: {
@@ -909,19 +910,19 @@ const COMBAT_ACTIONS = {
 
   "Stunning Blow": {
     card: `
-<div style="border:2px solid #6a0dad;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#6a0dad;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⭐ STUNNING BLOW</div>
+<div style="border:2px solid #7722aa;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#5c1a8a;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⭐ STUNNING BLOW</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#c0a0d8;margin-bottom:8px;">
     Make an <strong style="color:#e8d0f0;">Athletics Test</strong>. Foe must <strong style="color:#e8d0f0;">Resist Toughness</strong> or be <strong style="color:#e8d0f0;">Stunned</strong>.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;margin-bottom:6px;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;margin-bottom:6px;">
     ⚡ Stunned foe starts with <strong style="color:#e8d0f0;">1 less AP</strong> until Resist Toughness is successful.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ℹ Effect persists each Round until the foe successfully Resists.
   </div>
 </div>`,
@@ -933,16 +934,16 @@ const COMBAT_ACTIONS = {
 
   "Takedown": {
     card: `
-<div style="border:2px solid #6a0dad;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#6a0dad;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🤸 TAKEDOWN</div>
+<div style="border:2px solid #7722aa;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#5c1a8a;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🤸 TAKEDOWN</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#c0a0d8;margin-bottom:8px;">
     Make a <strong style="color:#e8d0f0;">Coordination or Athletics Test</strong>. Foe must <strong style="color:#e8d0f0;">Resist Coordination</strong> or be knocked <strong style="color:#e8d0f0;">Prone</strong>.
   </div>
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ⚡ If you used <strong style="color:#e8d0f0;">Charge</strong> this Turn, attacks gain <strong style="color:#e8d0f0;">1D6 Fury Die</strong>.
   </div>
 </div>`,
@@ -966,21 +967,21 @@ const COMBAT_ACTIONS = {
         furySection = `
     <div style="text-align:center;font-size:0.78em;color:#c0a0d8;margin-bottom:4px;">CHARGE FURY DIE</div>
     ${fury.exploded ? `<div style="text-align:center;font-size:0.75em;color:#ffaa00;margin-bottom:4px;">🔥 FURY DIE EXPLODED!</div>` : ""}
-    <div style="text-align:center;font-size:1.8em;font-weight:bold;color:${fury.exploded ? "#ffaa00" : "#cc44ff"};background:#1d0d2e;border:2px solid ${fury.exploded ? "#ffaa00" : "#6a0dad"};border-radius:6px;padding:4px;margin-bottom:4px;">+${fury.total}</div>
+    <div style="text-align:center;font-size:1.8em;font-weight:bold;color:${fury.exploded ? "#ffaa00" : "#cc44ff"};background:#1d0d2e;border:2px solid ${fury.exploded ? "#ffaa00" : "#8b0000"};border-radius:6px;padding:4px;margin-bottom:4px;">+${fury.total}</div>
     <div style="text-align:center;font-size:0.72em;color:#9060b0;margin-bottom:10px;">🎲 ${breakdown}</div>`;
       }
       const card = `
-<div style="border:2px solid #6a0dad;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#6a0dad;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🤸 TAKEDOWN</div>
+<div style="border:2px solid #7722aa;border-radius:6px;background:#110d1a;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#5c1a8a;color:#e8d0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🤸 TAKEDOWN</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
-    <span style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">PERILOUS STUNT</span>
+    <span style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#c0a0d8;margin-bottom:8px;">
     Make a <strong style="color:#e8d0f0;">Coordination or Athletics Test</strong>. Foe must <strong style="color:#e8d0f0;">Resist Coordination</strong> or be knocked <strong style="color:#e8d0f0;">Prone</strong>.
   </div>
   ${furySection}
-  <div style="background:#1d0d2e;border:1px solid #6a0dad;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
+  <div style="background:#1e0a30;border:1px solid #7722aa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ⚡ If you used <strong style="color:#e8d0f0;">Charge</strong> this Turn, attacks gain <strong style="color:#e8d0f0;">1D6 Fury Die</strong>.
   </div>
 </div>`;
@@ -999,16 +1000,16 @@ const COMBAT_ACTIONS = {
 
   "Channel Power": {
     card: `
-<div style="border:2px solid #7a7a8a;border-radius:6px;background:#131318;color:#e0e0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#4a4a5a;color:#e0e0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">✦ CHANNEL POWER</div>
+<div style="border:2px solid #1a5aaa;border-radius:6px;background:#0d1a2e;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#0e2a5a;color:#c8dcff;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">✦ CHANNEL POWER</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">
-    You attempt to <strong style="color:#e0e0f0;">increase your chances of success</strong> to Cast Magick during combat.
+    You attempt to <strong style="color:#e8d0f0;">increase your chances of success</strong> to Cast Magick during combat.
   </div>
-  <div style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#9090a8;">
+  <div style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ℹ See your Grimoire for specific Channeling rules and effects.
   </div>
 </div>`,
@@ -1019,16 +1020,16 @@ const COMBAT_ACTIONS = {
 
   "Inspiring Words": {
     card: `
-<div style="border:2px solid #7a7a8a;border-radius:6px;background:#131318;color:#e0e0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#4a4a5a;color:#e0e0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🗣 INSPIRING WORDS</div>
+<div style="border:2px solid #1a5aaa;border-radius:6px;background:#0d1a2e;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#0e2a5a;color:#c8dcff;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🗣 INSPIRING WORDS</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">
-    Make a <strong style="color:#e0e0f0;">Leadership Test</strong>. Number of allies equal to <strong style="color:#e0e0f0;">[FB]</strong> gain <strong style="color:#e0e0f0;">+1 Damage</strong> and <strong style="color:#e0e0f0;">Peril Threshold</strong>.
+    Make a <strong style="color:#e8d0f0;">Leadership Test</strong>. Number of allies equal to <strong style="color:#e8d0f0;">[FB]</strong> gain <strong style="color:#e8d0f0;">+1 Damage</strong> and <strong style="color:#e8d0f0;">Peril Threshold</strong>.
   </div>
-  <div style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
     ⚠ <strong style="color:#ffcccc;">Once per combat</strong> only.
   </div>
 </div>`,
@@ -1040,16 +1041,16 @@ const COMBAT_ACTIONS = {
 
   "Litnay Of Hatred": {
     card: `
-<div style="border:2px solid #7a7a8a;border-radius:6px;background:#131318;color:#e0e0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#4a4a5a;color:#e0e0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">😤 LITANY OF HATRED</div>
+<div style="border:2px solid #1a5aaa;border-radius:6px;background:#0d1a2e;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#0e2a5a;color:#c8dcff;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">😤 LITANY OF HATRED</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">
-    Make an <strong style="color:#e0e0f0;">Intimidate Test</strong>. Number of foes equal to <strong style="color:#e0e0f0;">[FB]</strong> suffer <strong style="color:#e0e0f0;">-1 Damage</strong> and <strong style="color:#e0e0f0;">Peril Threshold</strong>.
+    Make an <strong style="color:#e8d0f0;">Intimidate Test</strong>. Number of foes equal to <strong style="color:#e8d0f0;">[FB]</strong> suffer <strong style="color:#e8d0f0;">-1 Damage</strong> and <strong style="color:#e8d0f0;">Peril Threshold</strong>.
   </div>
-  <div style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
     ⚠ <strong style="color:#ffcccc;">Once per combat</strong> only.
   </div>
 </div>`,
@@ -1061,16 +1062,16 @@ const COMBAT_ACTIONS = {
 
   "Load": {
     card: `
-<div style="border:2px solid #7a7a8a;border-radius:6px;background:#131318;color:#e0e0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#4a4a5a;color:#e0e0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🔫 LOAD</div>
+<div style="border:2px solid #1a5aaa;border-radius:6px;background:#0d1a2e;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#0e2a5a;color:#c8dcff;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🔫 LOAD</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">VARIES</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">VARIES</span>
   </div>
   <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">
-    Load a <strong style="color:#e0e0f0;">ranged weapon</strong>. AP cost depends on the weapon being loaded.
+    Load a <strong style="color:#e8d0f0;">ranged weapon</strong>. AP cost depends on the weapon being loaded.
   </div>
-  <div style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#9090a8;">
+  <div style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ℹ Check your weapon's profile for its specific Load cost.
   </div>
 </div>`,
@@ -1081,16 +1082,16 @@ const COMBAT_ACTIONS = {
 
   "Subdue": {
     card: `
-<div style="border:2px solid #7a7a8a;border-radius:6px;background:#131318;color:#e0e0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#4a4a5a;color:#e0e0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">✋ SUBDUE</div>
+<div style="border:2px solid #1a5aaa;border-radius:6px;background:#0d1a2e;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#0e2a5a;color:#c8dcff;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">✋ SUBDUE</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1 AP</span>
   </div>
   <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">
-    You intentionally avoid inflicting <strong style="color:#e0e0f0;">Injuries</strong> or dealing enough Damage to render a foe <strong style="color:#e0e0f0;">Slain</strong> by your melee weapon attack.
+    You intentionally avoid inflicting <strong style="color:#e8d0f0;">Injuries</strong> or dealing enough Damage to render a foe <strong style="color:#e8d0f0;">Slain</strong> by your melee weapon attack.
   </div>
-  <div style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#9090a8;">
+  <div style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ℹ The foe is left alive and incapacitated rather than killed.
   </div>
 </div>`,
@@ -1101,16 +1102,16 @@ const COMBAT_ACTIONS = {
 
   "Take Aim": {
     card: `
-<div style="border:2px solid #7a7a8a;border-radius:6px;background:#131318;color:#e0e0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#4a4a5a;color:#e0e0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🎯 TAKE AIM</div>
+<div style="border:2px solid #1a5aaa;border-radius:6px;background:#0d1a2e;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#0e2a5a;color:#c8dcff;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🎯 TAKE AIM</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">1–2 AP</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">1–2 AP</span>
   </div>
   <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">
     Spend 1 AP for Routine +10%, or 2 AP for Easy +20% on your next Attack or Perilous Stunt.
   </div>
-  <div style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
     ⚠ You <strong style="color:#ffcccc;">cannot Take Aim</strong> to Cast Magick.
   </div>
 </div>`,
@@ -1132,6 +1133,13 @@ const COMBAT_ACTIONS = {
         }).render(true);
       });
       if (!apChoice) return;
+      const apCost   = parseInt(apChoice);
+      const currentAP = getAP(actor);
+      if (currentAP < apCost) {
+        ui.notifications.warn(`Not enough Action Points! Need ${apCost} AP but only have ${currentAP} AP remaining.`);
+        return;
+      }
+      await spendAP(actor, apCost);
       const bonus    = apChoice === "1" ? "+10" : "+20";
       const bonusVal = apChoice === "1" ? 10 : 20;
       const bonusColor = apChoice === "1" ? "#a0c8a0" : "#60d860";
@@ -1145,7 +1153,7 @@ const COMBAT_ACTIONS = {
           content: `
             <div style="font-family:'Palatino Linotype',serif;padding:4px 0 8px;">
               <p style="margin-bottom:8px;">Which weapon are you aiming with?</p>
-              <select name="weapon" style="width:100%;padding:4px;font-family:'Palatino Linotype',serif;background:#1e1e28;color:#e0e0f0;border:1px solid #7a7a8a;border-radius:4px;">
+              <select name="weapon" style="width:100%;padding:4px;font-family:'Palatino Linotype',serif;background:#071830;color:#c8dcff;border:1px solid #1a5aaa;border-radius:4px;">
                 ${weaponOptions}
               </select>
             </div>`,
@@ -1160,17 +1168,17 @@ const COMBAT_ACTIONS = {
       const weapon = actor.items.get(weaponId);
 
       const card = `
-<div style="border:2px solid #7a7a8a;border-radius:6px;background:#131318;color:#e0e0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#4a4a5a;color:#e0e0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🎯 TAKE AIM</div>
+<div style="border:2px solid #1a5aaa;border-radius:6px;background:#0d1a2e;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#0e2a5a;color:#c8dcff;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">🎯 TAKE AIM</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">${apChoice} AP</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">${apChoice} AP</span>
   </div>
-  <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:6px;">Weapon: <strong style="color:#e0e0f0;">${weapon.name}</strong></div>
+  <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:6px;">Weapon: <strong style="color:#e8d0f0;">${weapon.name}</strong></div>
   <div style="text-align:center;font-size:0.8em;color:#b0b0c8;margin-bottom:4px;">BASE CHANCE BONUS</div>
-  <div style="text-align:center;font-size:2.2em;font-weight:bold;color:${bonusColor};background:#1e1e28;border:2px solid #7a7a8a;border-radius:6px;padding:6px;margin-bottom:10px;text-shadow:0 0 8px ${bonusColor}88;">${bonus}</div>
-  <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">Applies to your <strong style="color:#e0e0f0;">next Attack Action or Perilous Stunt</strong> only.</div>
-  <div style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
+  <div style="text-align:center;font-size:2.2em;font-weight:bold;color:${bonusColor};background:#1d0d2e;border:2px solid #1a5aaa;border-radius:6px;padding:6px;margin-bottom:10px;text-shadow:0 0 8px ${bonusColor}88;">${bonus}</div>
+  <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">Applies to your <strong style="color:#e8d0f0;">next Attack Action or Perilous Stunt</strong> only.</div>
+  <div style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#ff9999;">
     ⚠ You <strong style="color:#ffcccc;">cannot Take Aim</strong> to Cast Magick.
   </div>
 </div>`;
@@ -1181,16 +1189,16 @@ const COMBAT_ACTIONS = {
 
   "Wait": {
     card: `
-<div style="border:2px solid #7a7a8a;border-radius:6px;background:#131318;color:#e0e0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
-  <div style="background:#4a4a5a;color:#e0e0f0;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⏳ WAIT</div>
+<div style="border:2px solid #1a5aaa;border-radius:6px;background:#0d1a2e;color:#e8d0f0;font-family:'Palatino Linotype',serif;padding:10px 14px;max-width:340px;">
+  <div style="background:#0e2a5a;color:#c8dcff;font-size:1.1em;font-weight:bold;letter-spacing:1px;text-align:center;padding:4px 8px;margin:-10px -14px 10px -14px;border-radius:4px 4px 0 0;">⏳ WAIT</div>
   <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
-    <span style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:2px 10px;font-size:0.9em;">0 AP</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">SPECIAL ACTION</span>
+    <span style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:2px 10px;font-size:0.9em;">0 AP</span>
   </div>
   <div style="font-size:0.85em;color:#b0b0c8;margin-bottom:8px;">
-    Wait until later to use your APs, but place yourself <strong style="color:#e0e0f0;">lower on the Initiative Ladder</strong>.
+    Wait until later to use your APs, but place yourself <strong style="color:#e8d0f0;">lower on the Initiative Ladder</strong>.
   </div>
-  <div style="background:#1e1e28;border:1px solid #7a7a8a;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#9090a8;">
+  <div style="background:#071830;border:1px solid #1a5aaa;border-radius:4px;padding:6px 10px;font-size:0.8em;color:#c0a0d8;">
     ℹ Your unused APs carry over to your new position in the Initiative order.
   </div>
 </div>`,
@@ -1206,15 +1214,12 @@ function ensureStyles() {
   const s = document.createElement("style");
   s.id = "luck-tab-styles";
   s.textContent = `
-    /* ── Dialog text colour fix ────────────────────────────── */
-    #app-dialog p, #app-dialog label,
-    .dialog p, .dialog label,
-    .window-app.dialog p, .window-app.dialog label,
-    form p, form label,
-    .dialog-content p, .dialog-content label,
-    .dialog-content div:not([style*="background"]),
-    .window-content > p, .window-content > label,
-    .window-content > div > p, .window-content > div > label {
+    /* ── Dialog text colour fix — scoped to dialog windows only ── */
+    .window-app.dialog .dialog-content p,
+    .window-app.dialog .dialog-content label,
+    .window-app.dialog .dialog-content div:not([style*="background"]),
+    .window-app.dialog .window-content p,
+    .window-app.dialog .window-content label {
       color: #e8e8e8 !important;
     }
 
@@ -1222,12 +1227,12 @@ function ensureStyles() {
       position: fixed; z-index: 10000;
       border-radius: 8px 8px 0 0; overflow: hidden;
       transition: max-height 0.3s, opacity 0.3s;
-      max-height: 0; opacity: 0; pointer-events: none; min-width: 280px;
+      max-height: 0; max-width: 355px; opacity: 0; pointer-events: none; min-width: 355px;
     }
     .ltp-panel { background: #1e1b14; border: 2px solid #c8a228; }
     .ltp-panel.ltp-open { max-height: 220px; opacity: 1; pointer-events: all; }
-    .ltr-panel { background: #181410; border: 2px solid #4a7c59; z-index: 10001; }
-    .ltr-panel.ltr-open { max-height: 260px; opacity: 1; pointer-events: all; }
+    .ltr-panel { background: #181410; border: 2px solid #4a7c59; }
+    .ltr-panel.ltr-open { max-height: 220px; opacity: 1; pointer-events: all; }
 
     .ltp-inner, .ltr-inner {
       padding: 14px 20px 18px; display: flex; flex-direction: column; gap: 12px;
@@ -1257,7 +1262,7 @@ function ensureStyles() {
     .ltr-close:hover { background: rgba(255,255,255,.08); color: #8ed4a4; }
 
     .ltp-score-row { display: flex; align-items: center; gap: 14px; }
-    .ltp-pips      { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+    .ltp-pips      { display: grid; grid-template-columns: repeat(10, 18px); gap: 4px; }
     .ltp-pip {
       width: 18px; height: 18px; border-radius: 50%;
       border: 2px solid #5a4a20; background: #2a2318;
@@ -1395,6 +1400,83 @@ function ensureStyles() {
     }
     .ltc-action-btn:hover { background: #3d0f0f; border-color: #cc3333; color: #fff; }
     .ltc-dot { width: 5px; height: 5px; border-radius: 50%; background: #cc2222; flex-shrink: 0; }
+ }
+
+    /* ── Attack Actions — bright crimson ── */
+    .ltc-section-header[data-section="Attack"] {
+      background: #380000; color: #ff9090; border-left-color: #cc1111;
+    }
+    .ltc-grid[data-section="Attack"] .ltc-action-btn {
+      background: #280808; border-color: #991010;
+    }
+    .ltc-grid[data-section="Attack"] .ltc-action-btn:hover {
+      background: #3a0f0f; border-color: #ee2222; color: #fff;
+    }
+    .ltc-grid[data-section="Attack"] .ltc-dot { background: #cc1111; }
+    .ltc-grid[data-section="Attack"] .ltc-ap {
+      background: #380000; color: #ff9090;
+    }
+
+    /* ── Movement Actions — muted sage green ── */
+    .ltc-section-header[data-section="Movement"] {
+      background: #111a12; color: #7aaa84; border-left-color: #2d5c35;
+    }
+    .ltc-grid[data-section="Movement"] .ltc-action-btn {
+      background: #111a12; border-color: #1e3d22;
+    }
+    .ltc-grid[data-section="Movement"] .ltc-action-btn:hover {
+      background: #182418; border-color: #3a6642; color: #c8deca;
+    }
+    .ltc-grid[data-section="Movement"] .ltc-dot { background: #2d5c35; }
+    .ltc-grid[data-section="Movement"] .ltc-ap {
+      background: #0d160e; color: #7aaa84;
+    }
+
+    /* ── Reactions — dark gold ── */
+    .ltc-section-header[data-section="Reactions"] {
+      background: #282003; color: #d4a820; border-left-color: #a07008;
+    }
+    .ltc-grid[data-section="Reactions"] .ltc-action-btn {
+      background: #282003; border-color: #5a3d06;
+    }
+    .ltc-grid[data-section="Reactions"] .ltc-action-btn:hover {
+      background: #1c1500; border-color: #a07820; color: #fff;
+    }
+    .ltc-grid[data-section="Reactions"] .ltc-dot { background: #a07008; }
+    .ltc-grid[data-section="Reactions"] .ltc-ap {
+      background: #1c1500; color: #d4a820;
+    }
+
+    /* ── Perilous Stunts — muted dusty purple ── */
+    .ltc-section-header[data-section="Perilous Stunts"] {
+      background: #1a1020; color: #9966bb; border-left-color: #5c2e80;
+    }
+    .ltc-grid[data-section="Perilous Stunts"] .ltc-action-btn {
+      background: #150b1e; border-color: #3d1e5a;
+    }
+    .ltc-grid[data-section="Perilous Stunts"] .ltc-action-btn:hover {
+      background: #1f1230; border-color: #6e3a99; color: #d4b8e8;
+    }
+    .ltc-grid[data-section="Perilous Stunts"] .ltc-dot { background: #5c2e80; }
+    .ltc-grid[data-section="Perilous Stunts"] .ltc-ap {
+      background: #1a1020; color: #9966bb;
+    }
+
+    /* ── Special Actions — muted steel blue ── */
+    .ltc-section-header[data-section="Special"] {
+      background: #0c1420; color: #5580aa; border-left-color: #1e3d66;
+    }
+    .ltc-grid[data-section="Special"] .ltc-action-btn {
+      background: #090f1a; border-color: #162840;
+    }
+    .ltc-grid[data-section="Special"] .ltc-action-btn:hover {
+      background: #101c2e; border-color: #2a5080; color: #b0c8e0;
+    }
+    .ltc-grid[data-section="Special"] .ltc-dot { background: #1e3d66; }
+    .ltc-grid[data-section="Special"] .ltc-ap {
+      background: #0c1420; color: #5580aa;
+    }
+
     .ltc-ap-pips { display: flex; gap: 6px; align-items: center; margin: 4px 0; }
     .ltc-ap-pip {
       width: 24px; height: 24px; border-radius: 50%;
@@ -1419,14 +1501,13 @@ function ensureStyles() {
     }
     #ltc-tooltip::after {
       content: ''; display: block; width: 0; height: 0; margin: 0 auto;
-      border: 6px solid transparent; border-top-color: #b8860b;
+      border: 6px solid transparent; border-top-color: #444466;
     }
     #ltc-tooltip.ltc-tip-flipped { flex-direction: column-reverse; }
-    #ltc-tooltip.ltc-tip-flipped::after { border-top-color: transparent; border-bottom-color: #b8860b; }
+    #ltc-tooltip.ltc-tip-flipped::after { border-top-color: transparent; border-bottom-color: #444466; }
     #ltc-tooltip-inner {
       width: 300px; max-height: 320px; overflow-y: auto;
-      border-radius: 6px; background: #1a0a0a; border: 1px solid #b8860b;
-      padding: 8px 10px; font-size: .78em; color: #e8d5c4; line-height: 1.5; box-sizing: border-box;
+      font-size: .78em; color: #e8d5c4; line-height: 1.5; box-sizing: border-box;
     }
     .ltp-badge {
       background: rgba(0,0,0,.3); border-radius: 10px; padding: 0 5px; font-weight: 800;
@@ -1455,7 +1536,7 @@ function buildLuckPanel(luck) {
           <span class="ltp-out-of">/ ${MAX_LUCK}</span>
         </div>
       </div>
-      <p class="ltp-hint">Your fortune — 0 to ${MAX_LUCK}.</p>
+      <p class="ltp-hint">Your luck — 0 to ${MAX_LUCK}.</p>
     </div>`;
   return d;
 }
@@ -1471,6 +1552,7 @@ function buildLuckBtn(luck) {
 function buildRestPanel(actor) {
   const peril = getPerilCurrent(actor);
   const pb    = getPerceptionBonus(actor);
+  const luckEnabled = isLuckEnabled();
   const d = document.createElement("div");
   d.className = "ltr-panel";
   d.innerHTML = `
@@ -1479,22 +1561,18 @@ function buildRestPanel(actor) {
         <span class="ltr-title"><i class="fas fa-moon"></i> Rest</span>
         <button class="ltr-close" type="button"><i class="fas fa-times"></i></button>
       </div>
-      <div class="ltr-info-row">
-        <span class="ltr-info-label">Current Peril</span>
-        <span class="ltr-info-value ltr-peril-val">${peril}</span>
-      </div>
-      <div class="ltr-info-row">
-        <span class="ltr-info-label">Perception Bonus (PB)</span>
-        <span class="ltr-info-value ltr-pb-val">${pb}</span>
-      </div>
+      ${luckEnabled ? `
       <div class="ltr-info-row">
         <span class="ltr-info-label">Luck Recovery Roll</span>
         <span class="ltr-info-value">1d10 + <span class="ltr-pb-formula">${pb}</span></span>
-      </div>
+      </div>` : ""}
       <button class="ltr-rest-btn" type="button">
         <i class="fas fa-campfire"></i> Take a Rest
       </button>
-      <p class="ltr-result">Recovers peril to Unhindered &amp; adds 1d10+PB Luck.</p>
+      <p class="ltr-result">${luckEnabled
+        ? "Recovers peril to Unhindered &amp; adds 1d10+PB Luck."
+        : "Recovers peril to Unhindered."
+      }</p>
     </div>`;
   return d;
 }
@@ -1509,14 +1587,19 @@ function buildRestBtn() {
 
 // ── Combat actions data ─────────────────────────────────────
 const COMBAT_SECTIONS = {
+  "Attack": [
+    { name: "Called Shot", ap: "2" }, { name: "Cast Magic", ap: "Varies" },
+    { name: "Melee Attack", ap: "1" }, { name: "Ranged Attack", ap: "1" },
+  ],
+  "Reactions": [
+    { name: "Assist", ap: "Varies" }, { name: "Counterspell", ap: "1" },
+    { name: "Dodge", ap: "1" },       { name: "Opportunity Attack", ap: "0" },
+    { name: "Parry", ap: "1" },       { name: "Resist", ap: "0" },
+  ],
   "Movement": [
     { name: "Charge", ap: "2" }, { name: "Get Up", ap: "2" },
     { name: "Hustle", ap: "1" }, { name: "Maneuver", ap: "2" },
     { name: "Run", ap: "1" },    { name: "Take Cover", ap: "1" },
-  ],
-  "Attack": [
-    { name: "Called Shot", ap: "2" }, { name: "Cast Magic", ap: "Varies" },
-    { name: "Melee Attack", ap: "1" }, { name: "Ranged Attack", ap: "1" },
   ],
   "Perilous Stunts": [
     { name: "Chokehold", ap: "1" }, { name: "Dirty Tricks", ap: "1" },
@@ -1527,13 +1610,8 @@ const COMBAT_SECTIONS = {
   "Special": [
     { name: "Channel Power", ap: "1" }, { name: "Inspiring Words", ap: "1" },
     { name: "Litnay Of Hatred", ap: "1" }, { name: "Load", ap: "Varies" },
-    { name: "Subdue", ap: "1" }, { name: "Take Aim", ap: "1-2" },
+    { name: "Subdue", ap: "1" }, { name: "Take Aim", ap: "1-2", handlesAP: true },
     { name: "Wait", ap: "0" },
-  ],
-  "Reactions": [
-    { name: "Assist", ap: "Varies" }, { name: "Counterspell", ap: "1" },
-    { name: "Dodge", ap: "1" },       { name: "Opportunity Attack", ap: "0" },
-    { name: "Parry", ap: "1" },       { name: "Resist", ap: "0" },
   ],
 };
 
@@ -1558,8 +1636,8 @@ function buildCombatPanel(actor) {
       </button>`
     ).join("");
     sectionsHTML += `
-      <div class="ltc-section-header">${section}</div>
-      <div class="ltc-grid">${btns}</div>`;
+      <div class="ltc-section-header" data-section="${section}">${section}</div>
+      <div class="ltc-grid" data-section="${section}">${btns}</div>`;
   }
 
   d.innerHTML = `
@@ -1618,6 +1696,10 @@ function wireCombatPanel(combatPanel, actor, inst) {
       if (!action?.card) return;
       tipInner.innerHTML = action.card;
       tipEl.classList.remove("ltc-tip-flipped");
+      // Always render above the highest open Foundry window (sheet tabs etc.)
+      const maxZ = Object.values(ui.windows ?? {})
+        .reduce((z, w) => Math.max(z, parseInt(w.element?.[0]?.style?.zIndex || w.element?.style?.zIndex || 0)), 0);
+      tipEl.style.zIndex = Math.max(99999, maxZ + 100);
       tipEl.style.display = "flex";
       const br     = btn.getBoundingClientRect();
       const tipW   = tipInner.offsetWidth  || 300;
@@ -1646,8 +1728,10 @@ function wireCombatPanel(combatPanel, actor, inst) {
       const apLabel   = actionDef?.ap ?? null;
       let   cost      = resolveAPCost(apLabel);
 
-      // For VARIES / range costs, prompt the player
-      if (cost === null && apLabel) {
+      // Skip the AP prompt entirely if the action's run() handles it internally
+      if (actionDef?.handlesAP) {
+        // run() will prompt + deduct AP itself — nothing to do here
+      } else if (cost === null && apLabel) {
         const labelUpper = String(apLabel).toUpperCase();
 
         if (/^\d[–\-]\d$/.test(apLabel)) {
@@ -1706,6 +1790,9 @@ function wireCombatPanel(combatPanel, actor, inst) {
 
       try {
         await action.run(actor);
+        // For actions that handle AP internally (e.g. Take Aim), the flag was
+        // updated inside run() — refresh the UI now so the display stays in sync.
+        if (actionDef?.handlesAP) refreshAPUI(inst, actor);
       } catch (err) {
         console.error(`[${MODULE_ID}] Action "${actionName}" error:`, err);
         ui.notifications.error(`Combat action "${actionName}" encountered an error. See console.`);
@@ -1724,14 +1811,19 @@ function positionFloaters(sheetEl, luckBtn, luckPanel, restBtn, restPanel, comba
   const MARGIN = 8;
 
   const btnLeft = r.right + MARGIN;
+  const luckEnabled = isLuckEnabled();
 
+  // Bottom anchor: luck at the very bottom if enabled, otherwise rest takes that slot
   const lbTop = r.bottom - BTN_SZ;
-  luckBtn.style.top   = lbTop + "px";
-  luckBtn.style.right = "";
-  luckBtn.style.left  = btnLeft + "px";
-  luckBtn.classList.add("ltp-ready");
 
-  const rbTop = lbTop - BTN_SZ - GAP;
+  if (luckEnabled) {
+    luckBtn.style.top   = lbTop + "px";
+    luckBtn.style.right = "";
+    luckBtn.style.left  = btnLeft + "px";
+    luckBtn.classList.add("ltp-ready");
+  }
+
+  const rbTop = luckEnabled ? lbTop - BTN_SZ - GAP : lbTop;
   restBtn.style.top   = rbTop + "px";
   restBtn.style.right = "";
   restBtn.style.left  = btnLeft + "px";
@@ -1745,9 +1837,11 @@ function positionFloaters(sheetEl, luckBtn, luckPanel, restBtn, restPanel, comba
 
   // Panels anchor at the same left edge as the buttons and grow rightward,
   // so they never overlap the character sheet.
-  luckPanel.style.top    = "auto";
-  luckPanel.style.bottom = (window.innerHeight - lbTop + GAP) + "px";
-  luckPanel.style.left   = btnLeft + "px";
+  if (luckEnabled) {
+    luckPanel.style.top    = "auto";
+    luckPanel.style.bottom = (window.innerHeight - lbTop + GAP) + "px";
+    luckPanel.style.left   = btnLeft + "px";
+  }
 
   restPanel.style.top    = "auto";
   restPanel.style.bottom = (window.innerHeight - rbTop + GAP) + "px";
@@ -1774,11 +1868,12 @@ function refreshAPUI(inst, actor) {
   const currentAP = getAP(actor);
   const pipsContainer = inst.combatPanel.querySelector("#ltc-ap-pips");
   if (!pipsContainer) return;
-  pipsContainer.innerHTML = buildAPPips(currentAP);
+  // Replace the node entirely so no stale listeners survive across refreshes.
+  const newContainer = pipsContainer.cloneNode(false);
+  newContainer.innerHTML = buildAPPips(currentAP);
+  pipsContainer.replaceWith(newContainer);
 
-  // Re-attach pip click handler after every innerHTML rebuild.
-  // stopPropagation prevents the click bubbling up to the combatBtn toggle.
-  pipsContainer.addEventListener("click", async (e) => {
+  newContainer.addEventListener("click", async (e) => {
     e.stopPropagation();
     const pip = e.target.closest(".ltc-ap-pip");
     if (!pip) return;
@@ -1792,7 +1887,7 @@ function refreshAPUI(inst, actor) {
       await setAP(actor, pipValue);
     }
     refreshAPUI(inst, actor);
-  }, { once: true }); // once: true so it doesn't stack on repeated refreshes
+  });
 
   // Dim action buttons that cost more AP than available
   inst.combatPanel.querySelectorAll(".ltc-action-btn").forEach(btn => {
@@ -1835,26 +1930,34 @@ async function doRest(actor, restPanel, inst) {
   try {
     await setPeril(actor, getUnhinderedPeril());
 
-    const pb   = getPerceptionBonus(actor);
-    const roll = new Roll(`1d10 + ${pb}`);
-    await roll.evaluate();
-    await roll.toMessage({
-      speaker: ChatMessage.getSpeaker({ actor }),
-      flavor:  `<strong>${actor.name}</strong> rests and recovers Luck (1d10 + ${pb} PB)`,
-    });
+    const pb = getPerceptionBonus(actor);
 
-    const previous = getLuck(actor);
-    const next     = await setLuck(actor, previous + roll.total);
+    if (isLuckEnabled()) {
+      const roll = new Roll(`1d10 + ${pb}`);
+      await roll.evaluate();
+      await roll.toMessage({
+        speaker: ChatMessage.getSpeaker({ actor }),
+        flavor:  `<strong>${actor.name}</strong> rests and recovers Luck (1d10 + ${pb} PB)`,
+      });
 
-    refreshRestUI(inst, actor);
-    refreshLuckUI(inst, actor);
+      const previous = getLuck(actor);
+      const next     = await setLuck(actor, previous + roll.total);
 
-    if (next >= MAX_LUCK) {
-      result.className = "ltr-result ltr-maxed";
-      result.textContent = `Luck maxed! Rolled ${roll.total} (was ${previous}, now ${next}/${MAX_LUCK}). Peril cleared.`;
+      refreshRestUI(inst, actor);
+      refreshLuckUI(inst, actor);
+
+      if (next >= MAX_LUCK) {
+        result.className = "ltr-result ltr-maxed";
+        result.textContent = `Luck maxed! Rolled ${roll.total} (was ${previous}, now ${next}/${MAX_LUCK}). Peril cleared.`;
+      } else {
+        result.className = "ltr-result ltr-success";
+        result.textContent = `Rolled ${roll.total} → Luck ${previous} → ${next}/${MAX_LUCK}. Peril cleared.`;
+      }
     } else {
+      // Luck disabled — just clear peril, no roll
+      refreshRestUI(inst, actor);
       result.className = "ltr-result ltr-success";
-      result.textContent = `Rolled ${roll.total} → Luck ${previous} → ${next}/${MAX_LUCK}. Peril cleared.`;
+      result.textContent = "Peril cleared.";
     }
   } catch (err) {
     console.error(`[${MODULE_ID}] Rest failed:`, err);
@@ -1872,8 +1975,10 @@ function teardown(appId) {
   const inst = _instances.get(appId);
   if (!inst) return;
   cancelAnimationFrame(inst.rafId);
-  inst.luckBtn.remove();
-  inst.luckPanel.remove();
+  if (inst.luckMounted) {
+    inst.luckBtn.remove();
+    inst.luckPanel.remove();
+  }
   inst.restBtn.remove();
   inst.restPanel.remove();
   inst.combatBtn.remove();
@@ -1914,7 +2019,7 @@ function attach(app) {
   // If already attached, just refresh UI — don't teardown/rebuild which closes panels.
   if (_instances.has(appId)) {
     const inst = _instances.get(appId);
-    refreshLuckUI(inst, actor);
+    if (inst.luckMounted) refreshLuckUI(inst, actor);
     refreshRestUI(inst, actor);
     refreshAPUI(inst, actor);
     return;
@@ -1922,22 +2027,25 @@ function attach(app) {
 
   ensureStyles();
 
-  const luck        = getLuck(actor);
-  const luckPanel   = buildLuckPanel(luck);
-  const luckBtn     = buildLuckBtn(luck);
+  const luckEnabled = isLuckEnabled();
+  const luck        = luckEnabled ? getLuck(actor) : 0;
+  const luckPanel   = luckEnabled ? buildLuckPanel(luck) : document.createElement("div");
+  const luckBtn     = luckEnabled ? buildLuckBtn(luck)   : document.createElement("div");
   const restPanel   = buildRestPanel(actor);
   const restBtn     = buildRestBtn();
   const combatPanel = buildCombatPanel(actor);
   const combatBtn   = buildCombatBtn();
 
-  document.body.appendChild(luckPanel);
-  document.body.appendChild(luckBtn);
+  if (luckEnabled) {
+    document.body.appendChild(luckPanel);
+    document.body.appendChild(luckBtn);
+  }
   document.body.appendChild(restPanel);
   document.body.appendChild(restBtn);
   document.body.appendChild(combatPanel);
   document.body.appendChild(combatBtn);
 
-  const inst = { luckBtn, luckPanel, restBtn, restPanel, combatBtn, combatPanel, rafId: null };
+  const inst = { luckBtn, luckPanel, luckMounted: luckEnabled, restBtn, restPanel, combatBtn, combatPanel, rafId: null };
   _instances.set(appId, inst);
 
   // Z-index elevation: bring the most recently opened panel to the front
@@ -1947,28 +2055,34 @@ function attach(app) {
     panel.style.zIndex = _panelZCounter;
   }
 
-  // Luck panel wiring
-  const openLuck  = () => { luckPanel.classList.add("ltp-open"); bringToFront(luckPanel); };
-  const closeLuck = () => luckPanel.classList.remove("ltp-open");
-  luckBtn.addEventListener("click", (e) => { e.stopPropagation(); luckPanel.classList.contains("ltp-open") ? closeLuck() : openLuck(); });
-  luckPanel.addEventListener("click", (e) => e.stopPropagation());
-  luckPanel.querySelector(".ltp-close").addEventListener("click", (e) => { e.stopPropagation(); closeLuck(); });
-  luckPanel.querySelectorAll(".ltp-pip").forEach(pip => {
-    pip.addEventListener("click", async () => {
-      const t = parseInt(pip.dataset.pip);
-      await setLuck(actor, getLuck(actor) === t ? t - 1 : t);
-      refreshLuckUI(inst, actor);
+  // Luck panel wiring — only wire up when luck is actually enabled and the
+  // panel has real content. When luck is disabled luckPanel/luckBtn are empty
+  // placeholder divs with no child elements, so querySelector returns null and
+  // calling addEventListener on null throws a TypeError that aborts attach()
+  // entirely — breaking ALL sheet tab interaction even for non-luck features.
+  if (luckEnabled) {
+    const openLuck  = () => { luckPanel.classList.add("ltp-open"); bringToFront(luckPanel); };
+    const closeLuck = () => luckPanel.classList.remove("ltp-open");
+    luckBtn.addEventListener("click", (e) => { e.stopPropagation(); luckPanel.classList.contains("ltp-open") ? closeLuck() : openLuck(); });
+    luckPanel.addEventListener("click", (e) => e.stopPropagation());
+    luckPanel.querySelector(".ltp-close").addEventListener("click", (e) => { e.stopPropagation(); closeLuck(); });
+    luckPanel.querySelectorAll(".ltp-pip").forEach(pip => {
+      pip.addEventListener("click", async () => {
+        const t = parseInt(pip.dataset.pip);
+        await setLuck(actor, getLuck(actor) === t ? t - 1 : t);
+        refreshLuckUI(inst, actor);
+      });
     });
-  });
-  const input = luckPanel.querySelector(".ltp-input");
-  const commit = async () => {
-    const v = parseInt(input.value);
-    if (!isNaN(v)) { await setLuck(actor, v); refreshLuckUI(inst, actor); }
-  };
-  input.addEventListener("change", commit);
-  input.addEventListener("keydown", async e => {
-    if (e.key === "Enter") { e.preventDefault(); input.blur(); await commit(); }
-  });
+    const input = luckPanel.querySelector(".ltp-input");
+    const commit = async () => {
+      const v = parseInt(input.value);
+      if (!isNaN(v)) { await setLuck(actor, v); refreshLuckUI(inst, actor); }
+    };
+    input.addEventListener("change", commit);
+    input.addEventListener("keydown", async e => {
+      if (e.key === "Enter") { e.preventDefault(); input.blur(); await commit(); }
+    });
+  }
 
   // Rest panel wiring
   const openRest  = () => { restPanel.classList.add("ltr-open"); bringToFront(restPanel); };
@@ -1993,7 +2107,7 @@ function attach(app) {
   Hooks.on("updateActor", updated => {
     if (updated.id !== actor.id) return;
     if (!_instances.has(appId)) return;
-    refreshLuckUI(inst, actor);
+    if (inst.luckMounted) refreshLuckUI(inst, actor);
     refreshRestUI(inst, actor);
     refreshAPUI(inst, actor);
   });
@@ -2008,6 +2122,23 @@ function attach(app) {
 
   console.log(`[${MODULE_ID}] attached to "${actor.name}" (appId: ${appId})`);
 }
+
+// ── Force all Dialogs spawned by this module above open sheets ──
+// Foundry assigns Dialog z-index at render time from its internal counter,
+// which can land below a focused character sheet. We bump every dialog that
+// renders while our combat panel is active to sit above everything.
+Hooks.on("renderDialog", (_app, html) => {
+  const el = html[0] ?? html; // works for jQuery or plain Element
+  if (!el) return;
+  const maxZ = Object.values(ui.windows ?? {})
+    .reduce((z, w) => Math.max(z, parseInt(w.element?.[0]?.style?.zIndex || w.element?.style?.zIndex || 0)), 0);
+  const target = Math.max(99999, maxZ + 100);
+  el.style.zIndex = target;
+  // v13 ApplicationV2 stores the element differently
+  if (_app.element && typeof _app.element.style !== "undefined") {
+    _app.element.style.zIndex = target;
+  }
+});
 
 // ── Hooks — actor sheets only ────────────────────────────────
 Hooks.on("renderActorSheet",    (app) => { setTimeout(() => attach(app), 0); });

@@ -7,12 +7,16 @@
     "minimum": "13",
     "verified": "13"
   },
+ "url": "https://github.com/SweetlilTrinket/Trinkets-Tabs.git",
+  "manifest": "https://raw.githubusercontent.com/SweetlilTrinket/Trinkets-Tabs/refs/heads/main/module.json",
+  "download": "https://github.com/SweetlilTrinket/Trinkets-Tabs/archive/refs/heads/main.zip",
   "authors": [
     {
-      "name": "Custom Module"
+      "name": "Trinket"
     }
   ],
   "esmodules": [
+    "scripts/settings.js",
     "scripts/rp-distributor.js",
     "scripts/ap-tracker.js",
     "scripts/luck-tab.js",
@@ -21,13 +25,6 @@
   "styles": [
     "styles/luck-tab.css",
     "styles/rp-distributor.css"
-  ],
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "lang/en.json"
-    }
   ],
   "system": ["zweihander"],
   "flags": {}

@@ -182,15 +182,32 @@ function _bindEvents(panel) {
   panel.querySelectorAll(".rp-subtab-btn").forEach(btn =>
     btn.addEventListener("click", () => _switchSubtab(panel, btn.dataset.subtab))
   );
-  panel.querySelector('[data-action="set-all"]')
-    ?.addEventListener("click", () => _bulkAction(panel, "set"));
+  panel.querySelector('[data-action="distribute-all"]')
+    ?.addEventListener("click", () => _distributeRP(panel));
   panel.querySelector('[data-action="add-all"]')
     ?.addEventListener("click", () => _bulkAction(panel, "add"));
   _bindListEvents(panel);
   _bindTrackerEvents(panel);
 }
 
+function _openActorSheet(actorId) {
+  const actor = game.actors.get(actorId);
+  if (!actor) return;
+  actor.sheet.render(true);
+}
+
 function _bindListEvents(panel) {
+  // Click actor name or avatar in the RP tab to open their character sheet
+  panel.querySelectorAll(".rp-char-name, .rp-char-avatar").forEach(el => {
+    el.style.cursor = "pointer";
+    el.title = "Open actor sheet";
+    el.addEventListener("click", ev => {
+      ev.stopPropagation();
+      const row = ev.currentTarget.closest("[data-actor-id]");
+      if (row) _openActorSheet(row.dataset.actorId);
+    });
+  });
+
   panel.querySelectorAll(".rp-include-check").forEach(cb =>
     cb.addEventListener("change", async ev => {
       const id = ev.currentTarget.dataset.actorId;
@@ -219,6 +236,17 @@ function _bindListEvents(panel) {
 }
 
 function _bindTrackerEvents(panel) {
+  // Click actor name or avatar in the Tracker tab to open their character sheet
+  panel.querySelectorAll(".rp-tracker-name, .rp-tracker-avatar").forEach(el => {
+    el.style.cursor = "pointer";
+    el.title = "Open actor sheet";
+    el.addEventListener("click", ev => {
+      ev.stopPropagation();
+      const row = ev.currentTarget.closest("[data-actor-id]");
+      if (row) _openActorSheet(row.dataset.actorId);
+    });
+  });
+
   // Tracker exclude toggles
   panel.querySelectorAll(".rp-tracker-include-check").forEach(cb =>
     cb.addEventListener("change", async ev => {
@@ -302,6 +330,23 @@ function _updateTrackerUI(panel, actorId, stat, value) {
 /* ════════════════════════════════════════════════════════════
    RP logic
    ════════════════════════════════════════════════════════════ */
+async function _distributeRP(panel) {
+  const total = parseInt(panel.querySelector("#bulk-rp-value")?.value || 0, 10);
+  if (isNaN(total) || total <= 0) return _showStatus(panel, "Enter a total RP amount to distribute.", "error");
+  const targets = game.actors.filter(a => a.type === "character" && !_excluded.has(a.id));
+  if (!targets.length) return _showStatus(panel, "No characters selected.", "error");
+  const share = Math.floor(total / targets.length);
+  const remainder = total % targets.length;
+  try {
+    await Promise.all(targets.map((a, i) => _applyRP(a, share + (i < remainder ? 1 : 0), "add")));
+    _showStatus(panel, `✦ Distributed ${total} RP across ${targets.length} character(s) (${share} each${remainder ? `, +1 to ${remainder}` : ""}).`, "success");
+    await _refreshPanel();
+  } catch (err) {
+    console.error("RP Distributor |", err);
+    _showStatus(panel, "Error distributing RP. Check console.", "error");
+  }
+}
+
 async function _bulkAction(panel, mode) {
   const value = parseInt(panel.querySelector("#bulk-rp-value")?.value || 0, 10);
   if (isNaN(value)) return _showStatus(panel, "Invalid value.", "error");

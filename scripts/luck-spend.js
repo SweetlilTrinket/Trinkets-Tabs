@@ -8,6 +8,7 @@
 //  d100 roll (margin of failure = luck cost).
 // ============================================================
 
+import { isLuckEnabled } from "./settings.js";
 const MODULE_ID = "trinket-tabs";
 const FLAG_KEY  = "luck";
 const MAX_LUCK  = 20;
@@ -342,6 +343,8 @@ async function handleLuckSpend(btn) {
 
 // ── Hook: new messages ──────────────────────────────────────
 Hooks.on("renderChatMessage", (message, html) => {
+  if (!isLuckEnabled()) return;
+
   // html may be a jQuery object or HTMLElement depending on Foundry version
   const el = html instanceof HTMLElement ? html : html[0];
   if (!el) return;
